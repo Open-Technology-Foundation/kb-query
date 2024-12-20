@@ -1,3 +1,5 @@
+#!/bin/bash
+
 cd /usr/share
 
 git clone https://github.com/Open-Technology-Foundation/kb-query.git
