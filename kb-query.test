@@ -1,0 +1,35 @@
+#!/bin/bash
+# # Script kb-query.test
+#
+# These are the essentials for accessing 
+# YaTTI knowledgebases using simple curl directives
+# to https://yatti.id/v1/
+#
+# Requires `curl`, `urlencode` and `jq`.
+# `sudo apt install gridsite-clients curl jq`
+#
+
+# This is the knowledgebase to access
+kb=appliedanthropology
+
+# This is the user/system query.
+query="What is a 'dharma'."
+
+# If context_only is set to 'context_only' then only
+# the text segments from the knowledgebase are
+# returned.
+context_only=''
+
+# To break up the json output into separate fields
+# you need to specify the fields you wish to see.
+# '.response' is usually the best default.
+# Other fieldnames are: kb, query, context_only,
+# elapsed_seconds, error, and '.'.
+fields=.response
+
+# Call the YaTTI API
+curl -H "Accept: application/json" \
+     -H "Content-Type: application/json" \
+     -s "https://yatti.id.local/v1/$kb/?q=$(urlencode "$query")&$context_only" \
+     | jq -r $fields
+#fin

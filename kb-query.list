@@ -1,0 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+PRGDIR=$(dirname -- "$(readlink -fn -- "$0")")
+
+"$PRGDIR"/kb-query list."${1:-canonical}" "${@:2}"
+
+#fin

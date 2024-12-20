@@ -1,0 +1,22 @@
+
+customkb query --help
+
+pwd
+
+ll
+
+cd kb
+
+ll
+
+
+ls -la $VECTORDBS/
+
+ls -la $VECTORDBS/prosocial.world/
+
+cat $VECTORDBS/prosocial.world/prosocial.world.cfg
+
+query="Briefly describe 'prosociality'. What it is useful for? (Use year-12 level language.)"
+
+customkb query -q prosocial.world.cfg "$query"
+

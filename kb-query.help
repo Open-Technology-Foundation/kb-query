@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+PRGDIR=$(dirname -- "$(readlink -fn -- "$0")")
+
+clear
+
+"$PRGDIR"/kb-query help "$@" | md2ansi | less
+
+#fin
