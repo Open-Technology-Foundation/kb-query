@@ -48,7 +48,8 @@ curl -H "Accept: application/json" \
      | jq -r $fields
 ```
 
-|| `kb-query.test` is a full test script with explanations:
+<details>
+  <summary>`kb-query.test` is a full test script with explanations:</summary>
 
 #!/bin/bash
 # These are the essentials for accessing
@@ -80,7 +81,9 @@ curl -H "Accept: application/json" \
      | jq -r $fields
 
 #fin
-||
+
+</details>
+
 
 ### API Commands
 
