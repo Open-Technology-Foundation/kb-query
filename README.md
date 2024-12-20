@@ -1,4 +1,4 @@
-# YaTTI Custom Knowledgebase System (`kb-query`)
+# YaTTI Custom Knowledgebase System
 
 YaTTI builds and maintains knowledgebases in various focussed fields.
 
@@ -11,18 +11,19 @@ Available knowledgebases at the moment are:
     okusiassociates
     prosocial.world
 
-The YaTTI API point is at `https://yatti.id/v1`
+The YaTTI API endpoint is `https://yatti.id/v1`
 
-Requirements:
+### Requirements:
 
 Requires Ubuntu 24.04, `curl`, `urlencode` and `jq`.
 
     sudo apt install gridsite-clients curl jq
 
-Installation One-liner:
+### Installation One-liner:
 
     sudo sh -c 'cd /usr/share && [ ! -d kb-query ] && git clone https://github.com/Open-Technology-Foundation/kb-query.git && ln -sf /usr/share/kb-query/kb-query /usr/local/bin/ && sudo apt install gridsite-clients curl jq'
 
+### Query API
 
 To query a knowledgebase, syntax is in this general form:
 
@@ -104,10 +105,10 @@ curl -s "https://yatti.id/v1/list"
 
 ## `kb-query` - YaTTI CustomKB API interface script
 
-The `kb-query` Bash script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for a `curl` command.
+The `kb-query` script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for a `curl` command.
 
 <details>
-  <summary>Full `kb-query` script</summary>
+  <summary>Full `kb-query` help</summary>
 
 ```
 kb-query 1.0.0 - Interface into YaTTI CustomKB knowledgebase API
