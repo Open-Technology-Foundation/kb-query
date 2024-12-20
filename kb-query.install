@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+cd /usr/share
+git clone https://github.com/Open-Technology-Foundation/kb-query.git
+cd kb-query
+iPWD="$PWD"
+(cd /usr/local/bin; ln -fs "$iPWD"/kb-query kb-query)
