@@ -48,9 +48,12 @@ curl -H "Accept: application/json" \
      | jq -r $fields
 ```
 
+#### Script `kb-query`
+
 <details>
   <summary>`kb-query.test` is a full test script with explanations:</summary>
 
+```bash
 #!/bin/bash
 # These are the essentials for accessing
 # YaTTI CustomKB knowledgebases using simple
@@ -81,6 +84,7 @@ curl -H "Accept: application/json" \
      | jq -r $fields
 
 #fin
+```
 
 </details>
 
@@ -102,6 +106,8 @@ curl -s "https://yatti.id/v1/list"
 
 The `kb-query` Bash script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for a `curl` command.
 
+<details>
+  <summary>
 ```
 kb-query 1.0.0 - Interface into YaTTI CustomKB knowledgebase API
 
@@ -151,5 +157,7 @@ Examples:
   # Return knowledgebase context only; print fields .query and .response
   kb-query -c appliedanthropology "Concisely define 'dharma'." .query .response
 ```
+</details>
+
 
 [?25h
