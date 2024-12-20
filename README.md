@@ -1,4 +1,4 @@
-# YaTTI Custom Knowledgebase System
+# YaTTI Custom Knowledgebase System (`kb-query`)
 
 YaTTI builds and maintains knowledgebases in various focussed fields.
 
@@ -11,17 +11,26 @@ Available knowledgebases at the moment are:
     okusiassociates
     prosocial.world
 
-The YaTTI API point is at https://yatti.id/v1
+The YaTTI API point is at `https://yatti.id/v1`
 
-To query a knowledgebase, the syntax is in this general form:
+Requirements:
 
-```bash
-curl -s "https://yatti.id/v1/{knowledgebase}?q={query}&{context_only}"
-```
+Requires Ubuntu 24.04, `curl`, `urlencode` and `jq`.
+
+    sudo apt install gridsite-clients curl jq
+
+Installation One-liner:
+
+    sudo sh -c 'cd /usr/share && [ ! -d kb-query ] && git clone https://github.com/Open-Technology-Foundation/kb-query.git && ln -sf /usr/share/kb-query/kb-query /usr/local/bin/ && sudo apt install gridsite-clients curl jq'
+
+
+To query a knowledgebase, syntax is in this general form:
+
+    curl -s "https://yatti.id/v1/{knowledgebase}?q={query}&{context_only}"
 
 There are two parameters; `q` and `context_only`.
 
-The `q` parameter is the text of your query. In curl, you must ensure the text is url encoded.
+The `q` parameter is the text of your query. In `curl`, you must ensure the text is url encoded.
 
 If `context_only` is set, then only the context is returned by the API; no LLM query is performed.
 
@@ -32,25 +41,19 @@ kb=appliedanthropology
 query="Define 'dharma'."
 fields=.response
 context_only=''
+
 curl -H "Accept: application/json" \
      -H "Content-Type: application/json" \
      -s "https://yatti.id/v1/$kb/?q=\$(urlencode "$query")&$context_only" \
      | jq -r $fields
 ```
 
-This is a full script of the above with explanations:
+|| `kb-query.test` is a full test script with explanations:
 
-```
 #!/bin/bash
-# # Script kb-query.test
-#
-# These are the essentials for accessing 
-# YaTTI knowledgebases using simple curl directives
-# to https://yatti.id/v1/
-#
-# Requires `curl`, `urlencode` and `jq`.
-# `sudo apt install gridsite-clients curl jq`
-#
+# These are the essentials for accessing
+# YaTTI CustomKB knowledgebases using simple
+# curl directives to https://yatti.id/v1/
 
 # This is the knowledgebase to access
 kb=appliedanthropology
@@ -58,9 +61,9 @@ kb=appliedanthropology
 # This is the user/system query.
 query="What is a 'dharma'."
 
-# If context_only is set to 'context_only' then only
-# the text segments from the knowledgebase are
-# returned.
+# If context_only is set to 'context_only' then
+# only the text segments from the knowledgebase
+# are returned.
 context_only=''
 
 # To break up the json output into separate fields
@@ -70,17 +73,18 @@ context_only=''
 # elapsed_seconds, error, and '.'.
 fields=.response
 
-# Call the YaTTI API
+# Call the YaTTI CustomKB API
 curl -H "Accept: application/json" \
      -H "Content-Type: application/json" \
      -s "https://yatti.id.local/v1/$kb/?q=$(urlencode "$query")&$context_only" \
      | jq -r $fields
+
 #fin
-```
+||
 
 ### API Commands
 
-Available commands are 'list' and 'help'.
+Available API commands are 'list' and 'help'.
 
 ```bash
 curl -s "https://yatti.id/v1/help"
@@ -91,9 +95,9 @@ curl -s "https://yatti.id/v1/list"
 
 ---
 
-## `kb-query` API interface script
+## `kb-query` - YaTTI CustomKB API interface script
 
-The `kb-query` Bash script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for the curl statement above.
+The `kb-query` Bash script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for a `curl` command.
 
 ```
 kb-query 1.0.0 - Interface into YaTTI CustomKB knowledgebase API
@@ -145,3 +149,4 @@ Examples:
   kb-query -c appliedanthropology "Concisely define 'dharma'." .query .response
 ```
 
+[?25h
