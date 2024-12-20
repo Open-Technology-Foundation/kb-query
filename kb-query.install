@@ -1,8 +1,7 @@
-#!/bin/bash
-set -e
-
 cd /usr/share
+
 git clone https://github.com/Open-Technology-Foundation/kb-query.git
-cd kb-query
-iPWD="$PWD"
-(cd /usr/local/bin; ln -fs "$iPWD"/kb-query kb-query)
+
+ln -sf /usr/share/kb-query/kb-query /usr/local/bin/
+
+sudo apt install gridsite-clients curl jq
