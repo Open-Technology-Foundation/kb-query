@@ -107,7 +107,7 @@ curl -s "https://yatti.id/v1/list"
 The `kb-query` Bash script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for a `curl` command.
 
 <details>
-  <summary>Full script
+  <summary>Full `kb-query` script</summary>
 
 ```
 kb-query 1.0.0 - Interface into YaTTI CustomKB knowledgebase API
