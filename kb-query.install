@@ -1,9 +1,42 @@
 #!/bin/bash
+set -euo pipefail
+((EUID)) && {
+  sudo -ln &>/dev/null || >&2 echo "Requires root, or non-interactive sudo privileges."
+  exec sudo -n "$0" "$@"
+  exit 1
+}
 
 cd /usr/share
 
-git clone https://github.com/Open-Technology-Foundation/kb-query.git
+# remove old backups
+rm -rf .kb-query
+[[ -d kb-query ]] && {
+  # make a backup in case git clone fails
+  mv kb-query .kb-query
+}
+
+sudo apt -yq install gridsite-clients curl jq
+
+git clone https://github.com/Open-Technology-Foundation/kb-query.git || {
+  [[ ! -d kb-query ]] && {
+    # failed! put it back!
+    mv .kb-query kb-query
+  }
+  exit 1
+}
+
+rm -rf .kbquery
 
 ln -sf /usr/share/kb-query/kb-query /usr/local/bin/
 
-sudo apt install gridsite-clients curl jq
+echo
+echo "# Welcome to kb-query"
+echo
+echo "   - a simple interface into YaTTI knowledgebases"
+echo
+echo "   - https://yatti.id/"
+echo
+echo "# kb-query --help"
+kb-query --help
+
+#fin
