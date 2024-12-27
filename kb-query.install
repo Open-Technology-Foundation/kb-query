@@ -6,27 +6,46 @@ set -euo pipefail
   exit 1
 }
 
+readonly -- PRG0="$(readlink -en -- "$0")"
+readonly -- PRGDIR="${PRG0%/*}" PRG="${PRG0##*/}"
+
+if (( $# == 0 )); then
+  tmpdir=/tmp/kb-query.install.clone
+  mkdir -p "$tmpdir"
+  cp -a "$PRGDIR" /var/backups/
+
+  cd "$tmpdir"
+  exec bash "$tmpdir"/kb-query.install cloned
+  exit $?
+fi
+
+if [[ "$1" != cloned ]]
+  echo wtf
+  exit 1
+fi
+
 cd /usr/share
 
 [[ -d kb-query ]] && {
   read -r -p "kb-query already exists. Do you wish to upgrade it? y/n " yn
   [[ ${yn,,} == 'y' ]] || { >&2 echo "Aborted"; exit 1; }
 
-  >&2 echo "Making a backup in var/backups in case git clone fails"
-  cp -a /usr/share/kb-query /var/backups/
+  >&2 echo "Deleting current /usr/share/kb-query"
+  rm -rf kb-query
 }
 
-sudo apt -yqq install gridsite-clients curl jq
-
 git clone https://github.com/Open-Technology-Foundation/kb-query.git || {
+  >&2 echo "git clone failed"
   [[ ! -d kb-query ]] && {
-    # failed! put it back!
+    >&2 echo "putting back backup"
     cp -a /var/backups/kb-query /usr/share/
   }
   exit 1
 }
 
 ln -sf /usr/share/kb-query/kb-query /usr/local/bin/
+
+sudo apt -yqq install gridsite-clients curl jq
 
 echo
 echo "# Welcome to kb-query"

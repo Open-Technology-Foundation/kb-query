@@ -82,19 +82,24 @@ Options:
   -h, --help            Display this help
 
 Examples:
+  # Get deeper help about YaTTI knowledgebases
   $PRG help
 
+  # Get lists of knowledgebases
   $PRG list
   $PRG list.canonical
   $PRG list.symlinks
   $PRG list.all
 
   # Process query+knowledgebase to LLM
-  $PRG appliedanthropology "Concisely define 'dharma'."
+  $PRG appliedanthropology \\
+      "Concisely define 'applied anthropology'."
 
-  # Return knowledgebase context only; print fields .query and .response
-  $PRG -c appliedanthropology "Concisely define 'dharma'." .query .response
-
+  # Return knowledgebase context only
+  # and print fields .query and .response
+  $PRG appliedanthropology --context-only \\
+      "Concisely define 'applied anthropology'." \\
+      .query .response
 
 EOT
 )
