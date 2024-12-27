@@ -46,6 +46,8 @@ Requires:
 
   curl urlencode jq
 
+  \`sudo apt install curl urlencode jq\`
+
 json Fields:
 
    kb query context_only response elapsed_seconds error
@@ -70,6 +72,8 @@ Options:
   -v, --verbose         Increase output verbosity
   -q, --quiet           Suppress non-error messages
                         $(decp VERBOSE)
+  -d, --debug           Print debug messages
+                        $(decp DEBUG)
   -V, --version         Print version and exit
                         $(decp VERSION)
   -h, --help            Display this help
@@ -105,28 +109,29 @@ kb_query() {
   (($#)) && shift
   local query="${1:-}"
   (($#)) && shift
-  local field fields='' comma=''
+
+  local field fields='' comma='' # no comma at the start
   while (($#)); do
     field="$1"
     [[ -z $field ]] && continue
     [[ "${field:0:1}" != '.' ]] && field=".$field"
     fields+="$comma$field"
-    comma=,
+    comma=, # there could be more to come
     shift
   done
   [[ -z $fields ]] && fields='.response'
 
-  if [[ $kb == 'list' || ${kb:0:5} == 'list.' ]]; then
+  [[ $kb == 'list' ]] && kb='list.canonical'
+
+  if [[ ${kb:0:5} == 'list.' ]]; then
     fields=${kb/list/.response}
-    kb=list
-    query=list
+    kb=list query=list
     context_only=''
   fi
 
   if [[ $kb == 'help' || $kb == '-h' || $kb == '--help' ]]; then
     fields=${kb/help/.response}
-    kb=help
-    query=help
+    kb=help query=help
     context_only=''
   fi
 

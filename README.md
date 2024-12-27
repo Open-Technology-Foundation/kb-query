@@ -117,6 +117,8 @@ Requires:
 
   curl urlencode jq
 
+  `sudo apt install curl urlencode jq`
+
 json Fields:
 
    kb query context_only response elapsed_seconds error
@@ -141,6 +143,8 @@ Options:
   -v, --verbose         Increase output verbosity
   -q, --quiet           Suppress non-error messages
                         VERBOSE="1"
+  -d, --debug           Print debug messages
+                        DEBUG="0"
   -V, --version         Print version and exit
                         VERSION="1.0.0"
   -h, --help            Display this help
