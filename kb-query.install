@@ -8,24 +8,23 @@ set -euo pipefail
 
 cd /usr/share
 
-# remove old backups
-rm -rf .kb-query
 [[ -d kb-query ]] && {
-  # make a backup in case git clone fails
-  mv kb-query .kb-query
+  read -r -p "kb-query already exists. Do you wish to upgrade it? y/n " yn
+  [[ ${yn,,} == 'y' ]] || { >&2 echo "Aborted"; exit 1; }
+
+  >&2 echo "Making a backup in var/backups in case git clone fails"
+  cp -a /usr/share/kb-query /var/backups/
 }
 
-sudo apt -yq install gridsite-clients curl jq
+sudo apt -yqq install gridsite-clients curl jq
 
 git clone https://github.com/Open-Technology-Foundation/kb-query.git || {
   [[ ! -d kb-query ]] && {
     # failed! put it back!
-    mv .kb-query kb-query
+    cp -a /var/backups/kb-query /usr/share/
   }
   exit 1
 }
-
-rm -rf .kbquery
 
 ln -sf /usr/share/kb-query/kb-query /usr/local/bin/
 
@@ -37,6 +36,11 @@ echo
 echo "   - https://yatti.id/"
 echo
 echo "# kb-query --help"
+echo
 kb-query --help
+
+[[ -f /var/backups/kb-query ]] && {
+  >&2 echo "Backup kq-query in /var/backups/kb-query"
+}
 
 #fin
