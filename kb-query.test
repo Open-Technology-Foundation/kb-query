@@ -24,7 +24,7 @@ fields=.response
 # Call the YaTTI CustomKB API
 curl -H "Accept: application/json" \
      -H "Content-Type: application/json" \
-     -s "https://yatti.id.local/v1/$kb/?q=$(urlencode "$query")&$context_only" \
+     -s "https://yatti.id/v1/$kb/?q=$(urlencode "$query")&$context_only" \
      | jq -r $fields
 
 #fin
