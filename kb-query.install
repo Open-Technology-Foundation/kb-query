@@ -1,39 +1,59 @@
 #!/bin/bash
+#
+# kb-query installation
+#
 set -euo pipefail
-((EUID)) && {
+
+# Require root for install to /usr/share/kb-query
+if ((EUID)); then
   sudo -ln &>/dev/null || >&2 echo "Requires root, or non-interactive sudo privileges."
   exec sudo -n "$0" "$@"
   exit 1
-}
+fi
 
 readonly -- PRG0="$(readlink -en -- "$0")"
 readonly -- PRGDIR="${PRG0%/*}" PRG="${PRG0##*/}"
 
-if (( $# == 0 )); then
-  tmpdir=/tmp/kb-query.install.clone
-  mkdir -p "$tmpdir"
-  cp -a "$PRGDIR" /var/backups/
-
-  cd "$tmpdir"
-  exec bash "$tmpdir"/kb-query.install cloned
-  exit $?
+# Help
+if [[ "${1:-}" == '-h' ||  "${1:-}" == '--help' ]]; then
+  >&2 echo "kb-query installation program"
+  >&2 echo "usage: $PRG"
+  exit 1
 fi
 
-if [[ "$1" != cloned ]]
+# Relauncher
+if (($# == 0)); then
+  # make backup
+  cp -a "$PRGDIR" /var/backups/
+  # create temporary installation dir
+  tmpdir=/tmp/kb-query.install.clone
+  mkdir -p "$tmpdir"
+  cp -a "$PRGDIR" "$tmpdir"/
+  cd "$tmpdir"
+  exec "$tmpdir"/kb-query.install cloned
+  exit 1
+fi
+
+# There is only one parameter,
+# and it must be 'cloned'
+if [[ "$1" != cloned ]]; then
   echo wtf
   exit 1
 fi
 
+# Rebase current directory
 cd /usr/share
 
-[[ -d kb-query ]] && {
+# kb-query already exists. overwrite?
+if [[ -d kb-query ]]; then
   read -r -p "kb-query already exists. Do you wish to upgrade it? y/n " yn
   [[ ${yn,,} == 'y' ]] || { >&2 echo "Aborted"; exit 1; }
 
   >&2 echo "Deleting current /usr/share/kb-query"
-  rm -rf kb-query
-}
+  rm -rf /usr/share/kb-query
+fi
 
+# Git it
 git clone https://github.com/Open-Technology-Foundation/kb-query.git || {
   >&2 echo "git clone failed"
   [[ ! -d kb-query ]] && {
@@ -43,19 +63,45 @@ git clone https://github.com/Open-Technology-Foundation/kb-query.git || {
   exit 1
 }
 
+# Create symlink in /usr/local/bin
 ln -sf /usr/share/kb-query/kb-query /usr/local/bin/
 
+# Dependencies
 sudo apt -yqq install gridsite-clients curl jq
 
-echo
-echo "# Welcome to kb-query"
-echo
-echo "   - a simple interface into YaTTI knowledgebases"
-echo
-echo "   - https://yatti.id/"
-echo
-echo "# kb-query --help"
-echo
+# Welcome
+clear
+cat <<EOT
+# Welcome to kb-query
+
+ - a simple interface into YaTTI knowledgebases
+
+ - https://yatti.id/
+
+## Useful starter commands:
+
+ - Help for kb-query utility
+
+    kb-query --help
+
+ - Overview YaTTI knowledgebase (accesses API)
+
+    kb-query help
+
+ - List YaTTI knowledgebases (accesses API)
+
+    kb-query list
+
+ - Query knowledgebase (accesses API)
+
+    kb-query appliedanthropology "Concisely define 'applied anthropology'."
+
+ - Query knowledgebase for context (accesses API)
+
+    kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
+
+EOT
+
 kb-query --help
 
 [[ -f /var/backups/kb-query ]] && {
