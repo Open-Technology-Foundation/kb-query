@@ -102,7 +102,8 @@ EOT
 
 
 kb_query() {
-  local baseurl='https://yatti.id.local/v1'
+  #local baseurl='https://yatti.id.local/v1'
+  local baseurl='https://yatti.id/v1'
   local kb="$1"
   (($#)) && shift
   local context_only=$( ((${1:-0})) && echo 'context_only' || echo '' )
