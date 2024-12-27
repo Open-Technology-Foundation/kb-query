@@ -45,8 +45,9 @@ fi
 cd /usr/share
 
 # kb-query already exists. overwrite?
-if [[ -d kb-query ]]; then
-  read -r -p "kb-query already exists. Do you wish to upgrade it? y/n " yn
+if [[ -d /usr/share/kb-query ]]; then
+  echo "/usr/share/kb-query already exists."
+  read -r -p "Do you wish to upgrade it? y/n " yn
   [[ ${yn,,} == 'y' ]] || { >&2 echo "Aborted"; exit 1; }
 
   >&2 echo "Deleting current /usr/share/kb-query"
