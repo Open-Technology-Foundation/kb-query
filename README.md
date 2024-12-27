@@ -81,7 +81,7 @@ fields=.response
 # Call the YaTTI CustomKB API
 curl -H "Accept: application/json" \
      -H "Content-Type: application/json" \
-     -s "https://yatti.id.local/v1/$kb/?q=$(urlencode "$query")&$context_only" \
+     -s "https://yatti.id/v1/$kb/?q=$(urlencode "$query")&$context_only" \
      | jq -r $fields
 
 #fin
@@ -115,9 +115,12 @@ kb-query 1.0.0 - Interface into YaTTI CustomKB knowledgebase API
 
 Requires:
 
-  curl urlencode jq
+    sudo apt install curl jq gridsite-clients
 
-  `sudo apt install curl urlencode jq`
+
+Installation:
+
+    kb-query.install
 
 json Fields:
 
