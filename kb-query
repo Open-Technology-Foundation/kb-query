@@ -44,9 +44,12 @@ $PRG $VERSION - Interface into YaTTI CustomKB knowledgebase API
 
 Requires:
 
-  curl urlencode jq
+    sudo apt install curl jq gridsite-clients
 
-  \`sudo apt install curl urlencode jq\`
+
+Installation:
+
+    kb-query.install
 
 json Fields:
 
