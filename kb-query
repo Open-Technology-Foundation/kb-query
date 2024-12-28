@@ -38,12 +38,12 @@ Requires:
 
 Installation:
 
-    kb-query.install
+    git clone https://github.com/Open-Technology-Foundation/kb-query.git && sudo kb-query/kb-query.install
 
 
-json Fields:
+json Return Fields:
 
-   kb query context_only response elapsed_seconds error
+   ( kb query context_only response elapsed_seconds error )
 
 
 Usage:
@@ -52,7 +52,7 @@ Usage:
 
   $PRG {-c} {knowledgebase} {query} [.field1 [.field2 ...]]
 
-  command         list||help
+  command         list | help | update
 
   knowledgebase   name of customKB knowledgebase
 
@@ -98,6 +98,10 @@ Examples:
   # Query knowledgebase for context only
 
     $PRG appliedanthropology -c "Concisely define 'applied anthropology'."
+
+  # Update to latest version
+
+    $PRG update
 
 EOT
 )
