@@ -153,24 +153,30 @@ Options:
   -h, --help            Display this help
 
 Examples:
-  # Get deeper help about YaTTI knowledgebases
-  kb-query help
 
-  # Get lists of knowledgebases
-  kb-query list
-  kb-query list.canonical
-  kb-query list.symlinks
-  kb-query list.all
+  - Help for kb-query utility
 
-  # Process query+knowledgebase to LLM
-  kb-query appliedanthropology \
-      "Concisely define 'applied anthropology'."
+    kb-query --help
 
-  # Return knowledgebase context only
-  # and print fields .query and .response
-  kb-query appliedanthropology --context-only \
-      "Concisely define 'applied anthropology'." \
-      .query .response
+  - Overview YaTTI knowledgebase
+
+    kb-query help
+
+  - List YaTTI knowledgebases
+
+    kb-query list
+
+  - Query knowledgebase
+
+    kb-query appliedanthropology "Concisely define 'applied anthropology'."
+
+  - Query knowledgebase and output fields .query and .response
+
+    kb-query appliedanthropology "Concisely define 'applied anthropology'." .query .response
+
+  - Query knowledgebase for context only
+
+    kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
 ```
 
 </details>
