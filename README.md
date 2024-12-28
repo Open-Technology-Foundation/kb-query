@@ -21,7 +21,7 @@ Requires Ubuntu 24.04, `curl`, `urlencode` and `jq`.
 
 ### Installation One-liner:
 
-    git clone https://github.com/Open-Technology-Foundation/kb-query.git && sudo kb-query/kb-query.install
+    cd /tmp && git clone https://github.com/Open-Technology-Foundation/kb-query.git && sudo kb-query/kb-query.install
 
 ### Query API
 
