@@ -137,7 +137,7 @@ mkdir -p /tmp/kb-query-update
 cd /tmp/kb-query-update
 rm -rf kb-query
 git clone https://github.com/Open-Technology-Foundation/kb-query.git
-sudo kb-query/kb-query.install
+exec sudo kb-query/kb-query.install
 EOT
     chmod 770 "$update_exec"
     exec "$update_exec"
