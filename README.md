@@ -15,9 +15,9 @@ The YaTTI API endpoint is `https://yatti.id/v1`
 
 ### Requirements:
 
-Requires Ubuntu 24.04, `curl`, `urlencode` and `jq`.
+Requires Ubuntu 24.04, `git`, `curl`, `urlencode` and `jq`.
 
-    sudo apt install gridsite-clients curl jq
+    sudo apt install gridsite-clients curl jq git
 
 ### Installation One-liner:
 
@@ -39,7 +39,7 @@ If `context_only` is set, then only the context is returned by the API; no LLM q
 
 ```bash
 kb=appliedanthropology
-query="Define 'dharma'."
+query="What is a dharma?"
 fields=.response
 context_only=''
 
