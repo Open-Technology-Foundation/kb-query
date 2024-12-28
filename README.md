@@ -21,7 +21,7 @@ Requires Ubuntu 24.04, `curl`, `urlencode` and `jq`.
 
 ### Installation One-liner:
 
-    sudo sh -c 'cd /usr/share && [ ! -d kb-query ] && git clone https://github.com/Open-Technology-Foundation/kb-query.git && ln -sf /usr/share/kb-query/kb-query /usr/local/bin/ && sudo apt install gridsite-clients curl jq'
+    git clone https://github.com/Open-Technology-Foundation/kb-query.git && sudo kb-query/kb-query.install
 
 ### Query API
 
@@ -111,75 +111,7 @@ The `kb-query` script is a simplified command-line interface into the customKB k
   <summary>Full `kb-query` help</summary>
 
 ```
-kb-query 0.1.1 - Interface into YaTTI CustomKB knowledgebase API
 
-Requires:
-
-    sudo apt install git curl jq gridsite-clients
-
-
-Installation:
-
-    kb-query.install
-
-
-json Fields:
-
-   kb query context_only response elapsed_seconds error
-
-
-Usage:
-
-  kb-query {command} [.field1 [.field2 ...]]
-
-  kb-query {-c} {knowledgebase} {query} [.field1 [.field2 ...]]
-
-  command         list||help
-
-  knowledgebase   name of customKB knowledgebase
-
-  query           query string for LLM
-
-  .field{1...}    fields to output, default is all.
-
-Options:
-  -c, --context-only    Return entire context reference only,
-                        do not send to LLM.
-                        context_only="0"
-  -v, --verbose         Increase output verbosity
-  -q, --quiet           Suppress non-error messages
-                        VERBOSE="1"
-  -d, --debug           Print debug messages
-                        DEBUG="0"
-  -V, --version         Print version and exit
-                        VERSION="0.1.1"
-  -h, --help            Display this help
-
-Examples:
-
-  # Help for kb-query utility
-
-    kb-query --help
-
-  # Overview YaTTI knowledgebase
-
-    kb-query help
-
-  # List YaTTI knowledgebases
-
-    kb-query list
-
-  # Query knowledgebase
-
-    kb-query appliedanthropology "Concisely define 'applied anthropology'."
-
-  # Query knowledgebase and output fields .query and .response
-
-    kb-query appliedanthropology "Concisely define 'applied anthropology'." .query .response
-
-  # Query knowledgebase for context only
-
-    kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
 ```
 
 </details>
