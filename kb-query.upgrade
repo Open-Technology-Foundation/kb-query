@@ -21,7 +21,7 @@ if [[ "${1:-}" == '-h' || "${1:-}" == '--help' ]]; then
   exit 0
 fi
 
-welcome() {
+welcome_and_exit() {
   # Welcome message
   clear
   cat <<EOT
@@ -58,10 +58,15 @@ EOT
     echo
     echo "Backup of kb-query is available at $BACKUP_DIR."
   fi
+
   echo
+  echo 'kb-query --version'
   kb-query --version
+
   echo
   echo "kb-query ${2:-install} complete."
+
+  exit 0
 }
 
 INSTALL_DIR="/usr/share/kb-query"
@@ -72,18 +77,17 @@ cd /usr/share
 
 if [[ -d "$INSTALL_DIR" ]]; then
   echo "'$INSTALL_DIR' already exists."
-  read -r -p "Do you want to backup and upgrade it? y/n " yn
-  [[ "${yn,,}" == y ]] || { echo "Upgrade aborted."; exit 1; }
   # Make backup
   rm -rf "$BACKUP_DIR"
   cp -a "$INSTALL_DIR" "$BACKUP_DIR"
   echo "Backup created at $BACKUP_DIR."
+
   # Upgrade using git pull
   cd "$INSTALL_DIR"
   git pull origin main
   echo
-  welcome "back " "upgrade"
-  exit
+
+  welcome_and_exit 'back ' upgrade
 fi
 
 # Dependencies
@@ -95,6 +99,6 @@ git clone -q https://github.com/Open-Technology-Foundation/kb-query.git "$INSTAL
 # Create symlink in /usr/local/bin
 ln -sf "$INSTALL_DIR/kb-query" /usr/local/bin/
 
-welcome
+welcome_and_exit '' install
 
 # fin
