@@ -111,11 +111,11 @@ The `kb-query` script is a simplified command-line interface into the customKB k
   <summary>Full `kb-query` help</summary>
 
 ```
-kb-query 1.0.0 - Interface into YaTTI CustomKB knowledgebase API
+kb-query 0.1.1 - Interface into YaTTI CustomKB knowledgebase API
 
 Requires:
 
-    sudo apt install curl jq gridsite-clients
+    sudo apt install git curl jq gridsite-clients
 
 
 Installation:
@@ -149,7 +149,7 @@ Options:
   -d, --debug           Print debug messages
                         DEBUG="0"
   -V, --version         Print version and exit
-                        VERSION="1.0.0"
+                        VERSION="0.1.1"
   -h, --help            Display this help
 
 Examples:
