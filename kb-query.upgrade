@@ -16,7 +16,7 @@ readonly PRGDIR="${PRG0%/*}" PRG="${PRG0##*/}"
 
 # Help
 if [[ "${1:-}" == '-h' || "${1:-}" == '--help' ]]; then
-  echo "kb-query upgrade program"
+  echo "kb-query install/upgrade program"
   echo "usage: $PRG"
   exit 0
 fi
@@ -52,13 +52,14 @@ welcome() {
    - Query knowledgebase for context (accesses API)
 
       kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
+
 EOT
-  echo
-  kb-query --version
   if [[ -d "$BACKUP_DIR" ]]; then
     echo
     echo "Backup of kb-query is available at $BACKUP_DIR."
   fi
+  echo
+  kb-query --version
   echo
   echo "kb-query ${2:-install} complete."
 }
@@ -86,16 +87,13 @@ if [[ -d "$INSTALL_DIR" ]]; then
 fi
 
 # Dependencies
-apt -yqq install git gridsite-clients curl jq
+apt -yqq install git curl jq gridsite-clients
 
-# Clone the repository if it doesn't exist
-git clone https://github.com/Open-Technology-Foundation/kb-query.git "$INSTALL_DIR"
+# Clone the repository
+git clone -q https://github.com/Open-Technology-Foundation/kb-query.git "$INSTALL_DIR"
 
 # Create symlink in /usr/local/bin
 ln -sf "$INSTALL_DIR/kb-query" /usr/local/bin/
-
-# Dependencies
-apt -yqq install gridsite-clients curl jq
 
 welcome
 
