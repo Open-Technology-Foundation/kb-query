@@ -23,7 +23,8 @@ fi
 
 welcome_and_exit() {
   # Welcome message
-  clear
+  echo
+  printf '%*s\n' "${COLUMNS:-78}" '' | tr ' ' '-'
   cat <<EOT
   # Welcome ${1:-}to kb-query
 
