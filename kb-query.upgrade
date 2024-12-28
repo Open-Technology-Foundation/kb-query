@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+# kb-query installation
+#
+set -euo pipefail
+
+# Require root for install to /usr/share/kb-query
+if ((EUID)); then
+  sudo -ln &>/dev/null || { >&2 echo "Requires root, or non-interactive sudo privileges."; exit 1; }
+  exec sudo -n "$0" "$@"
+  exit 1
+fi
+
+readonly PRG0="$(readlink -en -- "$0")"
+readonly PRGDIR="${PRG0%/*}" PRG="${PRG0##*/}"
+
+# Help
+if [[ "${1:-}" == '-h' || "${1:-}" == '--help' ]]; then
+  echo "kb-query upgrade program"
+  echo "usage: $PRG"
+  exit 0
+fi
+
+welcome() {
+  # Welcome message
+  clear
+  cat <<EOT
+  # Welcome ${1:-}to kb-query
+
+   - a simple interface into YaTTI knowledgebases
+
+   - https://yatti.id/
+
+  ## Useful starter commands:
+
+   - Help for kb-query utility
+
+      kb-query --help
+
+   - Overview YaTTI knowledgebase (accesses API)
+
+      kb-query help
+
+   - List YaTTI knowledgebases (accesses API)
+
+      kb-query list
+
+   - Query knowledgebase (accesses API)
+
+      kb-query appliedanthropology "Concisely define 'applied anthropology'."
+
+   - Query knowledgebase for context (accesses API)
+
+      kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
+EOT
+  echo
+  kb-query --version
+  if [[ -d "$BACKUP_DIR" ]]; then
+    echo
+    echo "Backup of kb-query is available at $BACKUP_DIR."
+  fi
+  echo
+  echo "kb-query ${2:-install} complete."
+}
+
+INSTALL_DIR="/usr/share/kb-query"
+BACKUP_DIR="/var/backups/kb-query"
+
+# Change to /usr/share
+cd /usr/share
+
+if [[ -d "$INSTALL_DIR" ]]; then
+  echo "'$INSTALL_DIR' already exists."
+  read -r -p "Do you want to backup and upgrade it? y/n " yn
+  [[ "${yn,,}" == y ]] || { echo "Upgrade aborted."; exit 1; }
+  # Make backup
+  rm -rf "$BACKUP_DIR"
+  cp -a "$INSTALL_DIR" "$BACKUP_DIR"
+  echo "Backup created at $BACKUP_DIR."
+  # Upgrade using git pull
+  cd "$INSTALL_DIR"
+  git pull origin main
+  echo
+  welcome "back " "upgrade"
+  exit
+fi
+
+# Dependencies
+apt -yqq install git gridsite-clients curl jq
+
+# Clone the repository if it doesn't exist
+git clone https://github.com/Open-Technology-Foundation/kb-query.git "$INSTALL_DIR"
+
+# Create symlink in /usr/local/bin
+ln -sf "$INSTALL_DIR/kb-query" /usr/local/bin/
+
+# Dependencies
+apt -yqq install gridsite-clients curl jq
+
+welcome
+
+# fin
