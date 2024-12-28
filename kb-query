@@ -128,8 +128,23 @@ kb_query() {
   done
   [[ -z $fields ]] && fields='.response'
 
-  [[ $kb == 'list' ]] && kb='list.canonical'
+  if [[ $kb == update || $kb == upgrade ]]; then
+    update_exec=/tmp/kb-query.update.from.git.sh
+    cat <<-EOT >"$update_exec"
+#!/bin/bash
+set -euo pipefail
+mkdir -p /tmp/kb-query-update
+cd /tmp/kb-query-update
+rm -rf kb-query
+git clone https://github.com/Open-Technology-Foundation/kb-query.git
+sudo kb-query/kb-query.install
+EOT
+    chmod 770 "$update_exec"
+    exec "$update_exec"
+    exit
+  fi
 
+  [[ $kb == 'list' ]] && kb='list.canonical'
   if [[ ${kb:0:5} == 'list.' ]]; then
     fields=${kb/list/.response}
     kb=list query=list
