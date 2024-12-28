@@ -4,13 +4,10 @@ set -euo pipefail
 readonly -- PRG0="$(readlink -en -- "$0")"
 #shellcheck disable=SC2034
 readonly -- PRGDIR="${PRG0%/*}" PRG="${PRG0##*/}"
-declare -- VERSION="$(cat -s "$PRGDIR"/.version)"
+declare -- VERSION="$(head -n 1 "$PRGDIR"/.version || true)"
 declare -ix VERBOSE=1 DEBUG=0 DRYRUN=1
 #shellcheck disable=SC2015
 [ -t 2 ] && declare -- RED=$'\033[0;31m' YELLOW=$'\033[0;33m' GREEN=$'\033[0;32m' NOCOLOR=$'\033[0m' || declare -- RED='' YELLOW='' GREEN='' NOCOLOR=''
-#vecho() { ((VERBOSE)) || return 0; local msg; for msg in "$@"; do printf '%s: %s\n' "$PRG" "$msg"; done; }
-#vinfo() { ((VERBOSE)) || return 0; local msg; for msg in "$@"; do >&2 printf '%s: %sinfo%s: %s\n' "$PRG" "$GREEN" "$NOCOLOR" "$msg"; done; }
-#vwarn() { ((VERBOSE)) || return 0; local msg; for msg in "$@"; do >&2 printf '%s: %swarn%s: %s\n' "$PRG" "$YELLOW" "$NOCOLOR" "$msg"; done; }
 vdebug(){ ((DEBUG))   || return 0; local msg; for msg in "$@"; do >&2 printf '%s: %sdebug%s: %s\n' "$PRG" "$YELLOW" "$NOCOLOR" "$msg"; done; }
 error() { local msg; for msg in "$@"; do >&2 printf '%s: %serror%s: %s\n' "$PRG" "$RED" "$NOCOLOR" "$msg"; done; }
 die() { local -i exitcode=1; if (($#)); then exitcode=$1; shift; fi; if (($#)); then error "$@"; fi; exit "$exitcode"; }
@@ -25,14 +22,6 @@ noarg() { if (($# < 2)) || [[ ${2:0:1} == '-' ]]; then die 2 "Missing argument f
 decp() { declare -p "$@" | sed 's/^declare -[a-zA-Z-]* //'; }
 xcleanup() { local -i exitcode=${1:-0}; [[ -t 0 ]] && printf '\e[?25h'; exit "$exitcode"; }
 trap 'xcleanup $?' SIGINT EXIT
-# Requires root or sudo
-#((EUID)) && { sudo -ln &>/dev/null || die 1 "Requires root, or non-interactive sudo privileges."; exec sudo -n "$0" "$@"; exit 1; }
-# Requires host okusi
-#[[ $HOSTNAME == 'okusi' ]] || die 1 "Can only run on development host 'okusi'"
-#trim() { local v="$*"; v="${v#"${v%%[![:blank:]]*}"}"; echo -n "${v%"${v##*[![:blank:]]}"}"; }
-#remblanks() { local str="$1"; while [[ "$str" =~ ([[:space:]]{2,}) ]]; do str="${str//${BASH_REMATCH[1]}/ }"; done; trim "$str"; }
-#isodate() { date +'%Y-%m-%d %H:%M:%S'; }
-#fqcommand() { local command="$1"; local apt_package="${2:-}"; command -v "$command" &>/dev/null && { command -v "$command"; return 0; }; [[ -z "$apt_package" ]] && die 1 "Command '$command' not found and no package specified"; vinfo "Installing package: $apt_package"; sudo apt-get install -y "$apt_package" >/dev/null 2>&1; command -v "$command" &>/dev/null || die 1 "Failed to install $command"; command -v "$command"; }
 # ----------------------------------------------------------------------------------------
 
 declare -x VECTORDBS=${VECTORDBS:-/var/lib/vectordbs}
@@ -51,11 +40,14 @@ Installation:
 
     kb-query.install
 
+
 json Fields:
 
    kb query context_only response elapsed_seconds error
 
+
 Usage:
+
   $PRG {command} [.field1 [.field2 ...]]
 
   $PRG {-c} {knowledgebase} {query} [.field1 [.field2 ...]]
@@ -83,27 +75,27 @@ Options:
 
 Examples:
 
-  - Help for $PRG utility
+  # Help for $PRG utility
 
     $PRG --help
 
-  - Overview YaTTI knowledgebase
+  # Overview YaTTI knowledgebase
 
     $PRG help
 
-  - List YaTTI knowledgebases
+  # List YaTTI knowledgebases
 
     $PRG list
 
-  - Query knowledgebase
+  # Query knowledgebase
 
     $PRG appliedanthropology "Concisely define 'applied anthropology'."
 
-  - Query knowledgebase and output fields .query and .response
+  # Query knowledgebase and output fields .query and .response
 
     $PRG appliedanthropology "Concisely define 'applied anthropology'." .query .response
 
-  - Query knowledgebase for context only
+  # Query knowledgebase for context only
 
     $PRG appliedanthropology -c "Concisely define 'applied anthropology'."
 

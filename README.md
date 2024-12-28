@@ -122,11 +122,14 @@ Installation:
 
     kb-query.install
 
+
 json Fields:
 
    kb query context_only response elapsed_seconds error
 
+
 Usage:
+
   kb-query {command} [.field1 [.field2 ...]]
 
   kb-query {-c} {knowledgebase} {query} [.field1 [.field2 ...]]
@@ -154,27 +157,27 @@ Options:
 
 Examples:
 
-  - Help for kb-query utility
+  # Help for kb-query utility
 
     kb-query --help
 
-  - Overview YaTTI knowledgebase
+  # Overview YaTTI knowledgebase
 
     kb-query help
 
-  - List YaTTI knowledgebases
+  # List YaTTI knowledgebases
 
     kb-query list
 
-  - Query knowledgebase
+  # Query knowledgebase
 
     kb-query appliedanthropology "Concisely define 'applied anthropology'."
 
-  - Query knowledgebase and output fields .query and .response
+  # Query knowledgebase and output fields .query and .response
 
     kb-query appliedanthropology "Concisely define 'applied anthropology'." .query .response
 
-  - Query knowledgebase for context only
+  # Query knowledgebase for context only
 
     kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
 ```
