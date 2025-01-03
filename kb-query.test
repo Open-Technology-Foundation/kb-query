@@ -1,30 +1,41 @@
 #!/bin/bash
+## !/usr/env /usr/local/bin/scripttour
 # These are the essentials for accessing
 # YaTTI CustomKB knowledgebases using simple
 # curl directives to https://yatti.id/v1/
 
-# This is the knowledgebase to access
+# This is the knowledgebase to access:
 kb=appliedanthropology
 
-# This is the user/system query.
-query="What is a 'dharma'."
+# This is the user/system query:
+query="What is a 'dharma'?"
 
 # If context_only is set to 'context_only' then
 # only the text segments from the knowledgebase
 # are returned.
+#context_only='context_only'
 context_only=''
 
 # To break up the json output into separate fields
 # you need to specify the fields you wish to see.
 # '.response' is usually the best default.
-# Other fieldnames are: kb, query, context_only,
+#
+# The other fieldnames are: kb, query, context_only,
 # elapsed_seconds, error, and '.'.
-fields=.response
+#
+# Use '.' to return all fields.
+#
+# If no fields are specified, then kb-query prints
+# out the value of .response.
+#
+fields=( .query .response )
 
-# Call the YaTTI CustomKB API
-curl -H "Accept: application/json" \
-     -H "Content-Type: application/json" \
-     -s "https://yatti.id/v1/$kb/?q=$(urlencode "$query")&$context_only" \
-     | jq -r $fields
+# Call the YaTTI Knowledgebase API using 'kb-query'
+kb-query "$kb" "$query" "${fields[@]}"
 
+# Or you can use 'curl' directly
+#curl -H "Accept: application/json" \
+#     -H "Content-Type: application/json" \
+#     -s "https://yatti.id/v1/$kb/?q=$(urlencode "$query")&$context_only" \
+#     | jq -r $fields
 #fin

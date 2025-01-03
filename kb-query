@@ -4,6 +4,7 @@ set -euo pipefail
 readonly -- PRG0="$(readlink -en -- "$0")"
 #shellcheck disable=SC2034
 readonly -- PRGDIR="${PRG0%/*}" PRG="${PRG0##*/}"
+readonly -- LF=$'\n'
 declare -- VERSION="$(head -n 1 "$PRGDIR"/.version || true)"
 declare -ix VERBOSE=1 DEBUG=0 DRYRUN=1
 #shellcheck disable=SC2015
@@ -50,17 +51,24 @@ Usage:
 
   $PRG {command} [.field1 [.field2 ...]]
 
-  $PRG {-c} {knowledgebase} {query} [.field1 [.field2 ...]]
+    command         list | help | update
 
-  command         list | help | update
 
-  knowledgebase   name of customKB knowledgebase
+  $PRG [OPTIONS] {knowledgebase} {query} [.field1 [.field2 ...]]
 
-  query           query string for LLM
+    knowledgebase   name of customKB knowledgebase
 
-  .field{1...}    fields to output, default is all.
+    query           query string for LLM
+
+    .field{1...}    fields to output, default is all.
 
 Options:
+  -r, --reference-file FILE
+                        Reference filename
+                        $(decp reference_file)
+  -R, --reference-str TEXT
+                        Reference string
+                        $(decp reference_text)
   -c, --context-only    Return entire context reference only,
                         do not send to LLM.
                         $(decp context_only)
@@ -95,9 +103,9 @@ Examples:
 
     $PRG appliedanthropology "Concisely define 'applied anthropology'." .query .response
 
-  # Query knowledgebase for context only
+  # Query knowledgebase for context only, with context reference
 
-    $PRG appliedanthropology -c "Concisely define 'applied anthropology'."
+    $PRG appliedanthropology -c -r previouscontext.txt "Concisely define 'applied anthropology'."
 
   # Update to latest version
 
@@ -111,16 +119,19 @@ EOT
 }
 
 
-kb_query() {
-  #local baseurl='https://yatti.id.local/v1'
+#  kb_query "$kb" "$context_only" "$query" "$reference" ${fields[*]}
+kbquery() {
+  # kb c query ref
   local baseurl='https://yatti.id/v1'
+  [[ $HOSTNAME == 'okusi' ]] && baseurl='https://yatti.id.local/v1'
   local kb="$1"
-  (($#)) && shift
+  shift
   local context_only=$( ((${1:-0})) && echo 'context_only' || echo '' )
-  (($#)) && shift
+  shift
   local query="${1:-}"
-  (($#)) && shift
-
+  shift
+  local reference="${1:-}"
+  shift
   local field fields='' comma='' # no comma at the start
   while (($#)); do
     field="$1"
@@ -131,6 +142,8 @@ kb_query() {
     shift
   done
   [[ -z $fields ]] && fields='.response'
+
+  ((DEBUG)) && >&2 decp baseurl kb context_only query reference fields
 
   if [[ $kb == update || $kb == upgrade ]]; then
     update_exec=/tmp/kb-query.update.from.git.sh
@@ -163,27 +176,47 @@ EOT
 
   # Debug output
   ((DEBUG)) && {
-    IFS=$'\n' readarray -t files < <(decp kb context_only query fields)
+    IFS=$'\n' readarray -t files < <(decp kb context_only query fields reference)
     vdebug "${files[@]}"
   }
-  curl -H "Accept: application/json" \
-       -H "Content-Type: application/json" \
-       -s "$baseurl/$kb/?q=$(urlencode "$query")&$context_only" \
-       | jq -r $fields
+
+  [[ -n $query ]]         && {
+    query=$(echo -e "$query")
+    query="$(urlencode "$query")"
+  }
+  [[ -n $context_only ]]  && context_only="&$context_only"
+  [[ -n $reference ]]     && {
+    reference=$(echo -e "$reference")
+    reference="&reference=$(urlencode "$reference")"
+  }
+  result="$(curl -X POST \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        -s "$baseurl/$kb/?q="$query"${context_only}${reference}"
+        )"
+
+  jq -r $fields <<<"$result"
 }
 
 
 #=============================================================================
 main() {
   local -i context_only=0
-  local command='' query=''
+  local command='' query='' reference='' reference_file='' reference_text=''
   local -a fields=()
 
   while (($#)); do case "$1" in
-    -c|--context) context_only=1 ;;
+    -r|--reference-file)
+                  noarg "$@"; shift; reference_file="$1"
+                  ;;
+    -R|--reference-str)
+                  noarg "$@"; shift; reference_text="$1"
+                  ;;
+    -c|--context-only|--context)
+                  context_only=1 ;;
     -d|--debug)   DEBUG=1; VERBOSE+=1;;
     -h|--help)    usage 0;; -v|--verbose) VERBOSE+=1;; -q|--quiet) VERBOSE=0;; -V|--version) echo "$PRG $VERSION"; exit 0;;
-    -[cdhvqV]*) #shellcheck disable=SC2046 #split up single options
+    -[rcdhvqV]*) #shellcheck disable=SC2046 #split up single options
                   set -- '' $(printf -- "-%c " $(grep -o . <<<"${1:1}")) "${@:2}";;
     -*)           die 22 "Invalid option '$1'" ;;
     *)            if [[ -z $command ]]; then
@@ -197,10 +230,17 @@ main() {
   esac; shift; done
   [[ -z $command ]] && usage 1
 
-  vdebug "kb_query \"$command\" \"$context_only\" \"$query\" \"${fields[@]}\""
+  if [[ -n $reference_text ]]; then
+    reference="$reference_text"
+  fi
+  if [[ -n $reference_file ]]; then
+    [[ -f $reference_file ]] || die 1 "Reference file '$reference_file' not found."
+    reference+="$(cat -s "$reference_file")$LF"
+  fi
 
-  kb_query "$command" "$context_only" "$query" ${fields[*]}
+  vdebug "0: kb_query \"$command\" \"$context_only\" \"$query\" \"${reference}\" \"${fields[*]}\""
 
+  kbquery "$command" "$context_only" "$query" "$reference" ${fields[*]}
 }
 
 main "$@"
