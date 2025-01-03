@@ -4,7 +4,13 @@ YaTTI builds and maintains knowledgebases in various focussed fields.
 
 Available knowledgebases at the moment are:
 
-
+appliedanthropology
+    garydean
+    jakartapost
+    motivation.se
+    okusiassociates
+    prosocial.world
+    seculardharma
 The YaTTI API endpoint is `https://yatti.id/v1`
 
 ### Requirements:
@@ -49,7 +55,47 @@ curl -H "Accept: application/json" \
   <summary>`kb-query.test` is a full test script with explanations:</summary>
 
 ```bash
+#!/bin/bash
+## !/usr/env /usr/local/bin/scripttour
+# These are the essentials for accessing
+# YaTTI CustomKB knowledgebases using simple
+# curl directives to https://yatti.id/v1/
 
+# This is the knowledgebase to access:
+kb=appliedanthropology
+
+# This is the user/system query:
+query="What is a 'dharma'?"
+
+# If context_only is set to 'context_only' then
+# only the text segments from the knowledgebase
+# are returned.
+#context_only='context_only'
+context_only=''
+
+# To break up the json output into separate fields
+# you need to specify the fields you wish to see.
+# '.response' is usually the best default.
+#
+# The other fieldnames are: kb, query, context_only,
+# elapsed_seconds, error, and '.'.
+#
+# Use '.' to return all fields.
+#
+# If no fields are specified, then kb-query prints
+# out the value of .response.
+#
+fields=( .query .response )
+
+# Call the YaTTI Knowledgebase API using 'kb-query'
+kb-query "$kb" "$query" "${fields[@]}"
+
+# Or you can use 'curl' directly
+#curl -H "Accept: application/json" \
+#     -H "Content-Type: application/json" \
+#     -s "https://yatti.id/v1/$kb/?q=$(urlencode "$query")&$context_only" \
+#     | jq -r $fields
+#fin
 ```
 
 </details>
@@ -75,10 +121,84 @@ The `kb-query` script is a simplified command-line interface into the customKB k
   <summary>Full `kb-query` help</summary>
 
 ```
+kb-query 0.1.6 - Interface into YaTTI CustomKB knowledgebase API
 
+Requires:
+
+    sudo apt install git curl jq gridsite-clients
+
+Installation:
+
+    git clone https://github.com/Open-Technology-Foundation/kb-query.git && sudo kb-query/kb-query.install
+
+json Return Fields:
+
+   ( kb query context_only response elapsed_seconds error )
+
+Usage:
+
+  kb-query {command} [.field1 [.field2 ...]]
+
+    command         list | help | update
+
+  kb-query [OPTIONS] {knowledgebase} {query} [.field1 [.field2 ...]]
+
+    knowledgebase   name of customKB knowledgebase
+
+    query           query string for LLM
+
+    .field{1...}    fields to output, default is all.
+
+Options:
+  -r, --reference-file FILE
+                        Reference filename
+                        reference_file=""
+  -R, --reference-str TEXT
+                        Reference string
+                        reference_text=""
+  -c, --context-only    Return entire context reference only,
+                        do not send to LLM.
+                        context_only="0"
+  -v, --verbose         Increase output verbosity
+  -q, --quiet           Suppress non-error messages
+                        VERBOSE="1"
+  -d, --debug           Print debug messages
+                        DEBUG="0"
+  -V, --version         Print version and exit
+                        VERSION="0.1.6"
+  -h, --help            Display this help
+
+Examples:
+
+  # Help for kb-query utility
+
+    kb-query --help
+
+  # Overview YaTTI knowledgebase
+
+    kb-query help
+
+  # List YaTTI knowledgebases
+
+    kb-query list
+
+  # Query knowledgebase
+
+    kb-query appliedanthropology "Concisely define 'applied anthropology'."
+
+  # Query knowledgebase and output fields .query and .response
+
+    kb-query appliedanthropology "Concisely define 'applied anthropology'." .query .response
+
+  # Query knowledgebase for context only, with context reference
+
+    kb-query appliedanthropology -c -r previouscontext.txt "Concisely define 'applied anthropology'."
+
+  # Update to latest version
+
+    kb-query update
 ```
 
 </details>
-
 
 [?25h

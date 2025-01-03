@@ -1,5 +1,12 @@
 #!/bin/bash
 set -euo pipefail
+# Pretty print kb-query help with md2ansi and less
+
+PRG0=$(readlink -en -- "$0")
+PRGDIR=$(dirname -- "$PRG0")
+
 clear
-"$(dirname -- "$(readlink -fn -- "$0")")"/kb-query help "$@" | md2ansi | less
+
+"$PRGDIR"/kb-query help "$@" | md2ansi | less -FXRS
+
 #fin
