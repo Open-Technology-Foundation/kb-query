@@ -121,7 +121,7 @@ The `kb-query` script is a simplified command-line interface into the customKB k
   <summary>Full `kb-query` help</summary>
 
 ```
-kb-query 0.1.6 - Interface into YaTTI CustomKB knowledgebase API
+kb-query 0.1.7 - Interface into YaTTI CustomKB knowledgebase API
 
 Requires:
 
@@ -165,7 +165,7 @@ Options:
   -d, --debug           Print debug messages
                         DEBUG="0"
   -V, --version         Print version and exit
-                        VERSION="0.1.6"
+                        VERSION="0.1.7"
   -h, --help            Display this help
 
 Examples:
@@ -201,4 +201,3 @@ Examples:
 
 </details>
 
-[?25h
