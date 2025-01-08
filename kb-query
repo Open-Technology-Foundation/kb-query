@@ -44,7 +44,7 @@ Installation:
 
 json Return Fields:
 
-   ( kb query context_only response elapsed_seconds error )
+   ( kb query context_only reference response elapsed_seconds error )
 
 
 Usage:
@@ -64,14 +64,38 @@ Usage:
 
 Options:
   -r, --reference-file FILE
-                        Reference filename
-                        $(decp reference_file)
+                    Reference filename
+                    $(decp reference_file)
   -R, --reference-str TEXT
-                        Reference string
-                        $(decp reference_text)
-  -c, --context-only    Return entire context reference only,
-                        do not send to LLM.
-                        $(decp context_only)
+                    Reference string
+                    $(decp reference_text)
+  -c, --context-only
+                    Return entire context reference only,
+                    do not send to LLM.
+                    $(decp context_only)
+
+  --query-model LLM
+                    LLM to use for query (if not context_only)
+  --query-temperature TEMP
+                    LLM Query Temperature
+  --query-max-tokens
+                    LLM max tokens allowed
+
+  --query-top-k SEGMENTS
+                    Number of SEGMENTS to return
+  --query-context-scope SCOPE
+                    Number of SEGMENTS above/below to return
+                    ("aperture")
+                    Eg,
+                      A SCOPE of 1 only returns the match segment.
+                      A SCOPE of 2 returns the match segment and the next segment.
+                      A SCOPE of 3 returns the match segment, the previous segment, and the next segment.
+                      A SCOPE of 4 returns the match segment, the previous segment, and the next 2 segments.
+  --query-role ROLE
+                    System ROLE
+  --query-context-files FILE[,FILE...]
+                    Context files
+
   -v, --verbose         Increase output verbosity
   -q, --quiet           Suppress non-error messages
                         $(decp VERBOSE)
@@ -119,11 +143,28 @@ EOT
 }
 
 
+#    VECTOR_MODEL
+#    VECTOR_DIMENSIONS
+#    VECTOR_CHUNKS
+#    DB_MIN_TOKENS
+#    DB_MAX_TOKENS
+declare -a EnvVars=(
+    QUERY_MODEL
+    QUERY_TOP_K
+    QUERY_TEMPERATURE
+    QUERY_MAX_TOKENS
+    QUERY_ROLE
+    QUERY_CONTEXT_SCOPE
+    QUERY_CONTEXT_FILES
+  )
+
+declare -a Options=()
+
 #  kb_query "$kb" "$context_only" "$query" "$reference" ${fields[*]}
 kbquery() {
   # kb c query ref
-  local baseurl='https://yatti.id/v1'
-  [[ $HOSTNAME == 'okusi' ]] && baseurl='https://yatti.id.local/v1'
+  local BASEURL='https://yatti.id/v1'
+  [[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'
   local kb="$1"
   shift
   local context_only=$( ((${1:-0})) && echo 'context_only' || echo '' )
@@ -143,10 +184,10 @@ kbquery() {
   done
   [[ -z $fields ]] && fields='.response'
 
-  ((DEBUG)) && >&2 decp baseurl kb context_only query reference fields
+  ((DEBUG)) && >&2 decp BASEURL kb context_only query reference fields
 
   if [[ $kb == update || $kb == upgrade ]]; then
-    update_exec=/tmp/kb-query.update.from.git.sh
+    update_exec=/tmp/kb-query.update.from.git."$$""$RANDOM".sh
     cat <<-EOT >"$update_exec"
 #!/bin/bash
 set -euo pipefail
@@ -180,19 +221,31 @@ EOT
     vdebug "${files[@]}"
   }
 
-  [[ -n $query ]]         && {
+  [[ -n $query ]] && {
     query=$(echo -e "$query")
     query="$(urlencode "$query")"
   }
-  [[ -n $context_only ]]  && context_only="&$context_only"
-  [[ -n $reference ]]     && {
+
+  [[ -n $context_only ]] && context_only="&$context_only"
+
+  [[ -n $reference ]] && {
     reference=$(echo -e "$reference")
     reference="&reference=$(urlencode "$reference")"
   }
+
+  options=''
+  for option in "${EnvVars[@]}"; do
+    [[ -v $option ]] || continue
+    options+="&$option=${!option}"
+  done
+  for option in "${Options[@]}"; do
+    options+="&$option"
+  done
+
   result="$(curl -X POST \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
-        -s "$baseurl/$kb/?q="$query"${context_only}${reference}"
+        -s "$BASEURL/$kb/?q="$query"$context_only$reference$options"
         )"
 
   jq -r $fields <<<"$result"
@@ -205,6 +258,7 @@ main() {
   local command='' query='' reference='' reference_file='' reference_text=''
   local -a fields=()
 
+  local -- option=''
   while (($#)); do case "$1" in
     -r|--reference-file)
                   noarg "$@"; shift; reference_file="$1"
@@ -213,11 +267,23 @@ main() {
                   noarg "$@"; shift; reference_text="$1"
                   ;;
     -c|--context-only|--context)
-                  context_only=1 ;;
-    -d|--debug)   DEBUG=1; VERBOSE+=1;;
+                  context_only=1
+                  ;;
+
+    -d|--debug)   DEBUG=1; VERBOSE+=1 ;;
     -h|--help)    usage 0;; -v|--verbose) VERBOSE+=1;; -q|--quiet) VERBOSE=0;; -V|--version) echo "$PRG $VERSION"; exit 0;;
-    -[rcdhvqV]*) #shellcheck disable=SC2046 #split up single options
+    -[rRcdhvqV]*) #shellcheck disable=SC2046 #split up single options
                   set -- '' $(printf -- "-%c " $(grep -o . <<<"${1:1}")) "${@:2}";;
+    --*)          noarg "$@"
+                  option="${1/--/}"
+                  option="${option^^}"
+                  option="${option//-/_}"
+                  shift
+                  arg="$1"
+                  [[ "${EnvVars[*]}" == *"$option"* ]] || die 1 "Invalid EnvVar '$option'"
+                  Options+=( "$option=$arg" )
+                  ;;
+
     -*)           die 22 "Invalid option '$1'" ;;
     *)            if [[ -z $command ]]; then
                     command="$1"
@@ -238,7 +304,7 @@ main() {
     reference+="$(cat -s "$reference_file")$LF"
   fi
 
-  vdebug "0: kb_query \"$command\" \"$context_only\" \"$query\" \"${reference}\" \"${fields[*]}\""
+  vdebug "0: kb_query \"$command\" \"$context_only\" \"$query\" \"${reference}\" \"${fields[*]}\" \"${Options[*]}\""
 
   kbquery "$command" "$context_only" "$query" "$reference" ${fields[*]}
 }
