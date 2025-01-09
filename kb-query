@@ -21,11 +21,13 @@ sed() { /usr/bin/sed "$@"; }
 declare -fx grep find rsync ssh scp sed
 noarg() { if (($# < 2)) || [[ ${2:0:1} == '-' ]]; then die 2 "Missing argument for option '$1'"; fi; true; }
 decp() { declare -p "$@" | sed 's/^declare -[a-zA-Z-]* //'; }
-xcleanup() { local -i exitcode=${1:-0}; [[ -t 0 ]] && printf '\e[?25h'; exit "$exitcode"; }
+xcleanup() { local -i exitcode=${1:-0}; exit "$exitcode"; }
 trap 'xcleanup $?' SIGINT EXIT
 # ----------------------------------------------------------------------------------------
 
 declare -x VECTORDBS=${VECTORDBS:-/var/lib/vectordbs}
+
+declare -i MAX_REFERENCE_SIZE=16000
 
 usage() {
   local -i exitcode=${1:-0}
@@ -215,12 +217,6 @@ EOT
     context_only=''
   fi
 
-  # Debug output
-  ((DEBUG)) && {
-    IFS=$'\n' readarray -t files < <(decp kb context_only query fields reference)
-    vdebug "${files[@]}"
-  }
-
   [[ -n $query ]] && {
     query=$(echo -e "$query")
     query="$(urlencode "$query")"
@@ -242,12 +238,18 @@ EOT
     options+="&$option"
   done
 
+  # Debug output
+  ((DEBUG)) && {
+    IFS=$'\n' readarray -t files < <(decp BASEURL kb context_only query fields reference options)
+    vdebug "${files[@]}"
+  }
+
   result="$(curl -X POST \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
         -s "$BASEURL/$kb/?q="$query"$context_only$reference$options"
         )"
-
+  ((DEBUG)) && vdebug "$result"
   jq -r $fields <<<"$result"
 }
 
@@ -303,6 +305,12 @@ main() {
     [[ -f $reference_file ]] || die 1 "Reference file '$reference_file' not found."
     reference+="$(cat -s "$reference_file")$LF"
   fi
+
+  (( ${#reference} > MAX_REFERENCE_SIZE )) && {
+    >&2 echo "Reference string too long (${#reference}>$MAX_REFERENCE_SIZE)"
+    >&2 echo "Truncating"
+    reference=${reference: -$MAX_REFERENCE_SIZE}
+  }
 
   vdebug "0: kb_query \"$command\" \"$context_only\" \"$query\" \"${reference}\" \"${fields[*]}\" \"${Options[*]}\""
 
