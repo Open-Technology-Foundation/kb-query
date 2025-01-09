@@ -166,7 +166,7 @@ declare -a Options=()
 kbquery() {
   # kb c query ref
   local BASEURL='https://yatti.id/v1'
-  [[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'
+  ####[[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'
   local kb="$1"
   shift
   local context_only=$( ((${1:-0})) && echo 'context_only' || echo '' )

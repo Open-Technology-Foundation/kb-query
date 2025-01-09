@@ -119,7 +119,7 @@ curl -s "https://yatti.id/v1/list"
 The `kb-query` script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for a `curl` command.
 
 ```
-kb-query 0.1.10 - Interface into YaTTI CustomKB knowledgebase API
+kb-query 0.1.2 - Interface into YaTTI CustomKB knowledgebase API
 
 Requires:
 
@@ -131,63 +131,33 @@ Installation:
 
 json Return Fields:
 
-   ( kb query context_only reference response elapsed_seconds error )
+   ( kb query context_only response elapsed_seconds error )
 
 Usage:
 
   kb-query {command} [.field1 [.field2 ...]]
 
-    command         list | help | update
+  kb-query {-c} {knowledgebase} {query} [.field1 [.field2 ...]]
 
-  kb-query [OPTIONS] {knowledgebase} {query} [.field1 [.field2 ...]]
+  command         list | help | update
 
-    knowledgebase   name of customKB knowledgebase
+  knowledgebase   name of customKB knowledgebase
 
-    query           query string for LLM
+  query           query string for LLM
 
-    .field{1...}    fields to output, default is all.
+  .field{1...}    fields to output, default is all.
 
 Options:
-  -r, --reference-file FILE
-                    Reference filename
-                    reference_file=""
-  -R, --reference-str TEXT
-                    Reference string
-                    reference_text=""
-  -c, --context-only
-                    Return entire context reference only,
-                    do not send to LLM.
-                    context_only="0"
-
-  --query-model LLM
-                    LLM to use for query (if not context_only)
-  --query-temperature TEMP
-                    LLM Query Temperature
-  --query-max-tokens
-                    LLM max tokens allowed
-
-  --query-top-k SEGMENTS
-                    Number of SEGMENTS to return
-  --query-context-scope SCOPE
-                    Number of SEGMENTS above/below to return
-                    ("aperture")
-                    Eg,
-                      A SCOPE of 1 only returns the match segment.
-                      A SCOPE of 2 returns the match segment and the next segment.
-                      A SCOPE of 3 returns the match segment, the previous segment, and the next segment.
-                      A SCOPE of 4 returns the match segment, the previous segment, and the next 2 segments.
-  --query-role ROLE
-                    System ROLE
-  --query-context-files FILE[,FILE...]
-                    Context files
-
+  -c, --context-only    Return entire context reference only,
+                        do not send to LLM.
+                        context_only="0"
   -v, --verbose         Increase output verbosity
   -q, --quiet           Suppress non-error messages
                         VERBOSE="1"
   -d, --debug           Print debug messages
                         DEBUG="0"
   -V, --version         Print version and exit
-                        VERSION="0.1.10"
+                        VERSION="0.1.2"
   -h, --help            Display this help
 
 Examples:
@@ -212,9 +182,9 @@ Examples:
 
     kb-query appliedanthropology "Concisely define 'applied anthropology'." .query .response
 
-  # Query knowledgebase for context only, with context reference
+  # Query knowledgebase for context only
 
-    kb-query appliedanthropology -c -r previouscontext.txt "Concisely define 'applied anthropology'."
+    kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
 
   # Update to latest version
 
