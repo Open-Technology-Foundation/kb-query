@@ -27,7 +27,7 @@ trap 'xcleanup $?' SIGINT EXIT
 
 declare -x VECTORDBS=${VECTORDBS:-/var/lib/vectordbs}
 
-declare -i MAX_REFERENCE_SIZE=16000
+declare -i MAX_REFERENCE_SIZE=4000
 
 usage() {
   local -i exitcode=${1:-0}
@@ -166,7 +166,7 @@ declare -a Options=()
 kbquery() {
   # kb c query ref
   local BASEURL='https://yatti.id/v1'
-  ####[[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'
+  [[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'
   local kb="$1"
   shift
   local context_only=$( ((${1:-0})) && echo 'context_only' || echo '' )
@@ -192,7 +192,7 @@ kbquery() {
     update_exec=/tmp/kb-query.update.from.git."$$""$RANDOM".sh
     cat <<-EOT >"$update_exec"
 #!/bin/bash
-set -euo pipefail
+set -e
 mkdir -p /tmp/kb-query-update
 cd /tmp/kb-query-update
 rm -rf kb-query
