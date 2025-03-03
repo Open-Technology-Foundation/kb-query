@@ -244,11 +244,33 @@ EOT
     vdebug "${files[@]}"
   }
 
-  result="$(curl -X POST \
+  result="$(curl --silent -X POST \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
-        -s "$BASEURL/$kb/?q="$query"$context_only$reference$options"
+        "$BASEURL/$kb/?q="$query"$context_only$reference$options"
         )"
+
+#result="$(curl --silent -X POST \
+#  -H "Accept: application/json" \
+#  -H "Content-Type: application/x-www-form-urlencoded" \
+#  --data-urlencode "query=$query" \
+#  --data-urlencode "context_only=$context_only" \
+#  --data-urlencode "reference=$reference" \
+#  --data-urlencode "options=$options" \
+#  "$BASEURL/$kb/")"
+
+#  result="$(curl  -X POST \
+#    -H "Accept: application/json" \
+#    -H "Content-Type: application/json" \
+#    --data '{
+#      "query": "'"$query"'",
+#      "context_only": "'"$context_only"'",
+#      "reference": "'"$reference"'",
+#      "options": "'"$options"'"
+#    }' \
+#    "$BASEURL/$kb/")"
+
+
   ((DEBUG)) && vdebug "$result"
   jq -r $fields <<<"$result"
 }
