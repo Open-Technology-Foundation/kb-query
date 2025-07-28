@@ -100,6 +100,18 @@ git clone -q https://github.com/Open-Technology-Foundation/kb-query.git "$INSTAL
 # Create symlink in /usr/local/bin
 ln -sf "$INSTALL_DIR/kb-query" /usr/local/bin/
 
+# Install bash completion if directory exists
+if [[ -d /etc/bash_completion.d ]]; then
+  cp "$INSTALL_DIR/kb-query-completion.bash" /etc/bash_completion.d/kb-query
+  echo "Bash completion installed to /etc/bash_completion.d/"
+fi
+
+# Create config directory and install example config
+CONFIG_DIR="/etc/kb-query"
+mkdir -p "$CONFIG_DIR"
+cp "$INSTALL_DIR/kb-query-config.example" "$CONFIG_DIR/config.example"
+echo "Example configuration installed to $CONFIG_DIR/config.example"
+
 welcome_and_exit '' install
 
 # fin

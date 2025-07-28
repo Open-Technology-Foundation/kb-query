@@ -25,9 +25,33 @@ xcleanup() { local -i exitcode=${1:-0}; exit "$exitcode"; }
 trap 'xcleanup $?' SIGINT EXIT
 # ----------------------------------------------------------------------------------------
 
+# Configuration file support
+declare -- CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/kb-query"
+declare -- CONFIG_FILE="$CONFIG_DIR/config"
+declare -- CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/kb-query"
+declare -- DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/kb-query"
+declare -- HISTORY_FILE="$DATA_DIR/history"
+
+# Load configuration if exists
+[[ -f "$CONFIG_FILE" ]] && source "$CONFIG_FILE"
+
+# Check config file permissions if it contains API key
+if [[ -f "$CONFIG_FILE" ]] && grep -q "YATTI_API_KEY" "$CONFIG_FILE" 2>/dev/null; then
+    local perms=$(stat -c %a "$CONFIG_FILE" 2>/dev/null || stat -f %p "$CONFIG_FILE" 2>&1 | awk '{print substr($0, length-2)}')
+    if [[ "$perms" != "600" ]]; then
+        >&2 echo "${YELLOW}Warning: Config file has loose permissions ($perms)${NOCOLOR}"
+        >&2 echo "Your API key may be exposed. Run: chmod 600 $CONFIG_FILE"
+    fi
+fi
+
 declare -x VECTORDBS=${VECTORDBS:-/var/lib/vectordbs}
 
-declare -i MAX_REFERENCE_SIZE=4000
+declare -i MAX_REFERENCE_SIZE=${MAX_REFERENCE_SIZE:-4000}
+declare -i API_TIMEOUT=${API_TIMEOUT:-30}
+declare -- OUTPUT_FORMAT=${OUTPUT_FORMAT:-text}
+
+# API Authentication
+declare -- API_KEY="${YATTI_API_KEY:-}"
 
 usage() {
   local -i exitcode=${1:-0}
@@ -98,6 +122,18 @@ Options:
   --query-context-files FILE[,FILE...]
                     Context files
 
+  --output-format FORMAT
+                    Output format: json, text, markdown
+                    $(decp OUTPUT_FORMAT)
+  --timeout SECONDS
+                    API request timeout in seconds
+                    $(decp API_TIMEOUT)
+
+  --api-key KEY     API authentication key
+                    WARNING: Exposes key in process list
+                    Prefer: export YATTI_API_KEY="your-key"
+                    $(decp API_KEY)
+
   -v, --verbose         Increase output verbosity
   -q, --quiet           Suppress non-error messages
                         $(decp VERBOSE)
@@ -137,6 +173,14 @@ Examples:
 
     $PRG update
 
+  # Query with custom output format
+
+    $PRG --output-format json appliedanthropology "What is dharma?"
+
+  # Query with custom timeout
+
+    $PRG --timeout 60 appliedanthropology "Complex analysis question"
+
 EOT
 )
   ((exitcode)) && >&2 echo "$helptext" || echo "$helptext"
@@ -166,7 +210,7 @@ declare -a Options=()
 kbquery() {
   # kb c query ref
   local BASEURL='https://yatti.id/v1'
-  [[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'
+  # [[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'  # Disabled - always use public endpoint
   local kb="$1"
   shift
   local context_only=$( ((${1:-0})) && echo 'context_only' || echo '' )
@@ -189,7 +233,8 @@ kbquery() {
   ((DEBUG)) && >&2 decp BASEURL kb context_only query reference fields
 
   if [[ $kb == update || $kb == upgrade ]]; then
-    update_exec=/tmp/kb-query.update.from.git."$$""$RANDOM".sh
+    # Secure temp file creation using mktemp
+    update_exec=$(mktemp /tmp/kb-query.update.XXXXXX.sh) || die 1 "Failed to create temp file"
     cat <<-EOT >"$update_exec"
 #!/bin/bash
 set -e
@@ -204,6 +249,24 @@ EOT
     exit
   fi
 
+  # Cache management for list command
+  if [[ $kb == 'list' ]] || [[ ${kb:0:5} == 'list.' ]]; then
+    local cache_file="$CACHE_DIR/kb-list"
+    local cache_ttl=${KB_LIST_CACHE_TTL:-3600}
+    
+    # Check if we should use cache
+    if [[ -f "$cache_file" ]] && [[ $(( $(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0) )) -lt $cache_ttl ]]; then
+      # Use cached result
+      ((DEBUG)) && vdebug "Using cached KB list"
+      result="$(cat "$cache_file")"
+      if [[ ${kb:0:5} == 'list.' ]]; then
+        fields=${kb/list/.response}
+      fi
+      jq -r $fields <<<"$result"
+      return 0
+    fi
+  fi
+  
   [[ $kb == 'list' ]] && kb='list.canonical'
   if [[ ${kb:0:5} == 'list.' ]]; then
     fields=${kb/list/.response}
@@ -218,23 +281,27 @@ EOT
   fi
 
   [[ -n $query ]] && {
-    query=$(echo -e "$query")
+    # Use printf instead of echo -e for better security
+    query=$(printf '%b' "$query")
     query="$(urlencode "$query")"
   }
 
   [[ -n $context_only ]] && context_only="&$context_only"
 
   [[ -n $reference ]] && {
-    reference=$(echo -e "$reference")
+    # Use printf instead of echo -e for better security
+    reference=$(printf '%b' "$reference")
     reference="&reference=$(urlencode "$reference")"
   }
 
   options=''
   for option in "${EnvVars[@]}"; do
     [[ -v $option ]] || continue
-    options+="&$option=${!option}"
+    # URL encode option values for security
+    options+="&$option=$(urlencode "${!option}")"
   done
   for option in "${Options[@]}"; do
+    # Options array already contains key=value pairs
     options+="&$option"
   done
 
@@ -242,13 +309,40 @@ EOT
   ((DEBUG)) && {
     IFS=$'\n' readarray -t files < <(decp BASEURL kb context_only query fields reference options)
     vdebug "${files[@]}"
+    # Mask API key in debug output
+    if [[ -n "$API_KEY" ]]; then
+      vdebug "Using API key: ${API_KEY:0:8}...${API_KEY: -4}"
+    fi
   }
 
-  result="$(curl --silent -X POST \
+  # Add authentication headers if API key is provided
+  local auth_headers=""
+  if [[ -n "$API_KEY" ]]; then
+    auth_headers="-H 'Authorization: Bearer $API_KEY'"
+  fi
+
+  # Show progress if not quiet
+  if ! ((VERBOSE == 0)); then
+    printf "Querying %s... " "$kb" >&2
+  fi
+  
+  # Add timeout and capture curl exit code
+  result="$(eval curl --silent --max-time "$API_TIMEOUT" -X POST \
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
+        $auth_headers \
         "$BASEURL/$kb/?q="$query"$context_only$reference$options"
-        )"
+        )" || {
+    curl_exit=$?
+    case $curl_exit in
+      7)  die 1 "Failed to connect to API endpoint: $BASEURL/$kb/" ;;
+      28) die 1 "Request timeout - API took too long to respond" ;;
+      401) die 1 "Authentication failed - check your API key" ;;
+      403) die 1 "Access forbidden - API key may lack permissions" ;;
+      429) die 1 "Rate limit exceeded - too many requests" ;;
+      *)  die 1 "Network error (curl exit code: $curl_exit)" ;;
+    esac
+  }
 
 #result="$(curl --silent -X POST \
 #  -H "Accept: application/json" \
@@ -271,8 +365,73 @@ EOT
 #    "$BASEURL/$kb/")"
 
 
+  # Complete progress indicator
+  if ! ((VERBOSE == 0)); then
+    printf "done\n" >&2
+  fi
+  
   ((DEBUG)) && vdebug "$result"
-  jq -r $fields <<<"$result"
+  
+  # Validate JSON response
+  if [[ -z "$result" ]]; then
+    die 1 "Empty response from API"
+  fi
+  
+  if ! jq -e . >/dev/null 2>&1 <<<"$result"; then
+    die 1 "Invalid JSON response from API: $result"
+  fi
+  
+  # Check for API error messages
+  if jq -e '.error' >/dev/null 2>&1 <<<"$result"; then
+    error_msg=$(jq -r '.error // "Unknown error"' <<<"$result")
+    die 1 "API Error: $error_msg"
+  fi
+  
+  # Check for null response on non-list/help commands
+  if [[ "$kb" != "list" ]] && [[ "$kb" != "help" ]] && [[ $(jq -r '.response // "null"' <<<"$result") == "null" ]]; then
+    die 1 "Knowledge base '$kb' not found or returned no data"
+  fi
+  
+  # Format output based on OUTPUT_FORMAT
+  case "$OUTPUT_FORMAT" in
+    json)
+      # Output raw JSON
+      jq . <<<"$result"
+      ;;
+    markdown)
+      # Format as markdown with metadata
+      if [[ "$fields" == ".response" ]]; then
+        echo "## Query Response"
+        echo
+        jq -r '.response // empty' <<<"$result"
+        echo
+        echo "---"
+        echo "*Knowledge Base: $(jq -r '.kb // "unknown"' <<<"$result")*"
+        echo "*Query Time: $(jq -r '.elapsed_seconds // "unknown"' <<<"$result") seconds*"
+      else
+        jq -r $fields <<<"$result"
+      fi
+      ;;
+    text|*)
+      # Default text output
+      jq -r $fields <<<"$result"
+      ;;
+  esac
+  
+  # Save to cache if it's a list command
+  if [[ "$kb" == "list" ]]; then
+    mkdir -p "$CACHE_DIR"
+    echo "$result" > "$CACHE_DIR/kb-list"
+    ((DEBUG)) && vdebug "Cached KB list"
+  fi
+  
+  # Save to history if successful and not a command
+  if [[ "$kb" != "list" ]] && [[ "$kb" != "help" ]] && [[ "$kb" != "update" ]] && [[ -n "$query" ]]; then
+    # Create directory if it doesn't exist
+    mkdir -p "$DATA_DIR"
+    # Append to history with timestamp
+    echo "$(date -Iseconds) | $kb | $query" >> "$HISTORY_FILE"
+  fi
 }
 
 
@@ -292,6 +451,22 @@ main() {
                   ;;
     -c|--context-only|--context)
                   context_only=1
+                  ;;
+    --output-format)
+                  noarg "$@"; shift; OUTPUT_FORMAT="$1"
+                  case "$OUTPUT_FORMAT" in
+                    json|text|markdown) ;;
+                    *) die 1 "Invalid output format: $OUTPUT_FORMAT (must be json, text, or markdown)" ;;
+                  esac
+                  ;;
+    --timeout)
+                  noarg "$@"; shift; API_TIMEOUT="$1"
+                  [[ "$API_TIMEOUT" =~ ^[0-9]+$ ]] || die 1 "Timeout must be a positive integer"
+                  ;;
+    --api-key)
+                  noarg "$@"; shift; API_KEY="$1"
+                  >&2 echo "${YELLOW}Warning: --api-key exposes key in process list${NOCOLOR}"
+                  >&2 echo "Prefer: export YATTI_API_KEY='your-key'"
                   ;;
 
     -d|--debug)   DEBUG=1; VERBOSE+=1 ;;
@@ -325,6 +500,10 @@ main() {
   fi
   if [[ -n $reference_file ]]; then
     [[ -f $reference_file ]] || die 1 "Reference file '$reference_file' not found."
+    # Validate file path to prevent directory traversal
+    if [[ "$reference_file" =~ \.\. ]] || [[ "$reference_file" =~ ^/ ]] && [[ ! "$reference_file" =~ ^/home/|^/tmp/|^/var/tmp/ ]]; then
+      die 1 "Invalid reference file path: '$reference_file'"
+    fi
     reference+="$(cat -s "$reference_file")$LF"
   fi
 
@@ -336,7 +515,7 @@ main() {
 
   vdebug "0: kb_query \"$command\" \"$context_only\" \"$query\" \"${reference}\" \"${fields[*]}\" \"${Options[*]}\""
 
-  kbquery "$command" "$context_only" "$query" "$reference" ${fields[*]}
+  kbquery "$command" "$context_only" "$query" "$reference" "${fields[@]}"
 }
 
 main "$@"

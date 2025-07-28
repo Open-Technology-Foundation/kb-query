@@ -1,0 +1,74 @@
+#!/bin/bash
+# kb-query configuration file
+# Copy to ~/.config/kb-query/config and customize
+
+# API Authentication
+# YaTTI API key for authentication
+# Get your API key from your administrator
+# Or if you have access: yatti-api-key create your@email.com
+#YATTI_API_KEY="yatti_your_api_key_here"
+
+# SECURITY WARNING: This file should have restricted permissions
+# Run: chmod 600 ~/.config/kb-query/config
+
+# API Settings
+# Base URL for the YaTTI API (default: https://yatti.id/v1)
+#BASEURL="https://yatti.id/v1"
+
+# Request timeout in seconds (default: 30)
+API_TIMEOUT=30
+
+# Output format: json, text, markdown (default: text)
+OUTPUT_FORMAT=text
+
+# Reference file settings
+# Maximum size for reference content in characters (default: 4000)
+MAX_REFERENCE_SIZE=4000
+
+# Default query parameters
+# These can be overridden on the command line
+
+# Default LLM model for queries
+#QUERY_MODEL="gpt-4o-mini"
+
+# Default temperature for LLM responses (0.0-1.0)
+#QUERY_TEMPERATURE="0.7"
+
+# Default maximum tokens for responses
+#QUERY_MAX_TOKENS="2000"
+
+# Default number of segments to retrieve
+#QUERY_TOP_K="10"
+
+# Default context scope (aperture)
+#QUERY_CONTEXT_SCOPE="3"
+
+# Default system role/prompt
+#QUERY_ROLE="You are a helpful assistant that provides accurate information based on the given context."
+
+# Directory settings
+# Where to store knowledge bases (default: /var/lib/vectordbs)
+#VECTORDBS="/var/lib/vectordbs"
+
+# Verbosity settings
+# Set to 0 for quiet mode, 1 for normal, 2+ for verbose
+#VERBOSE=1
+
+# Debug mode (0=off, 1=on)
+#DEBUG=0
+
+# History settings
+# Whether to save query history (set to 0 to disable)
+SAVE_HISTORY=1
+
+# Cache settings
+# How long to cache the knowledge base list (in seconds)
+KB_LIST_CACHE_TTL=3600
+
+# Performance settings
+# Number of parallel queries for batch mode (when implemented)
+#BATCH_WORKERS=4
+
+# Custom aliases for knowledge bases
+# alias_myproject="actual-kb-name"
+# This allows you to use 'kb-query myproject' instead of 'kb-query actual-kb-name'
