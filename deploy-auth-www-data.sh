@@ -111,6 +111,14 @@ else
     echo "${YELLOW}⚠ Authentication may not be working${NOCOLOR}"
 fi
 
+# Note about schema file
+echo
+echo "6. Schema file installation..."
+echo "${YELLOW}Note: Ask admin to install schema file:${NOCOLOR}"
+echo "   sudo mkdir -p /usr/share/yatti"
+echo "   sudo cp v1/api_keys_schema.sql /usr/share/yatti/"
+echo "   sudo chmod 644 /usr/share/yatti/api_keys_schema.sql"
+
 echo
 echo "${GREEN}Deployment complete!${NOCOLOR}"
 echo

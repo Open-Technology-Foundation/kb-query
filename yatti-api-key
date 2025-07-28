@@ -10,7 +10,7 @@ set -euo pipefail
 # Configuration
 VECTORDBS="${VECTORDBS:-/var/lib/vectordbs}"
 AUTH_DB="$VECTORDBS/.auth/api_keys.db"
-SCHEMA_FILE="$(dirname "$0")/v1/api_keys_schema.sql"
+SCHEMA_FILE="/usr/share/yatti/api_keys_schema.sql"
 
 # Colors for output
 RED=$'\033[0;31m'

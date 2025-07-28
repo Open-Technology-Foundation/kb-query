@@ -103,6 +103,15 @@ else
 fi
 
 echo
+# Install schema file
+echo
+echo "7. Installing schema file..."
+mkdir -p /usr/share/yatti
+cp v1/api_keys_schema.sql /usr/share/yatti/
+chmod 644 /usr/share/yatti/api_keys_schema.sql
+echo "${GREEN}✓ Schema file installed${NOCOLOR}"
+
+echo
 echo "${GREEN}Deployment complete!${NOCOLOR}"
 echo
 echo "Next steps:"

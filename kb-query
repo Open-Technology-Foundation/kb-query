@@ -318,7 +318,7 @@ EOT
   # Add authentication headers if API key is provided
   local auth_headers=""
   if [[ -n "$API_KEY" ]]; then
-    auth_headers="-H 'Authorization: Bearer $API_KEY'"
+    auth_headers="-H \"Authorization: Bearer $API_KEY\""
   fi
 
   # Show progress if not quiet
@@ -331,7 +331,7 @@ EOT
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
         $auth_headers \
-        "$BASEURL/$kb/?q="$query"$context_only$reference$options"
+        "$BASEURL/index.php/$kb/?q="$query"$context_only$reference$options"
         )" || {
     curl_exit=$?
     case $curl_exit in

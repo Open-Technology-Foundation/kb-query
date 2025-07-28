@@ -4,10 +4,7 @@ YaTTI builds and maintains knowledgebases in various focussed fields.
 
 Available knowledgebases at the moment are:
 
-CLAUDE.md
     appliedanthropology
-    embedding-cache-management.sh
-    fixlang.sh
     garydean
     jakartapost
     okusiassociates
@@ -18,7 +15,26 @@ CLAUDE.md
     seculardharma
     uv
     wayang.net
+
 The YaTTI API endpoint is `https://yatti.id/v1`
+
+### Authentication
+
+This API requires authentication using an API key. Include your API key in the request headers:
+
+```bash
+# Using Authorization header (recommended)
+curl -H "Authorization: Bearer yatti_your_api_key_here" ...
+
+# Using X-API-Key header
+curl -H "X-API-Key: yatti_your_api_key_here" ...
+
+# With kb-query tool
+export YATTI_API_KEY="yatti_your_api_key_here"
+kb-query appliedanthropology "your query"
+```
+
+To obtain an API key, contact the administrator.
 
 ### Requirements:
 
@@ -34,7 +50,7 @@ Requires Ubuntu 24.04, `git`, `curl`, `urlencode` and `jq`.
 
 To query a knowledgebase, syntax is in this general form:
 
-    curl -s "https://yatti.id/v1/{knowledgebase}?q={query}&{context_only}"
+    curl -s -H "Authorization: Bearer $API_KEY" "https://yatti.id/v1/{knowledgebase}?q={query}&{context_only}"
 
 There are two parameters; `q` and `context_only`.
 
@@ -49,9 +65,11 @@ kb=appliedanthropology
 query="What is a dharma?"
 fields=.response
 context_only=''
+api_key="yatti_your_api_key_here"
 
 curl -H "Accept: application/json" \
      -H "Content-Type: application/json" \
+     -H "Authorization: Bearer $api_key" \
      -s "https://yatti.id/v1/$kb/?q=\$(urlencode "$query")&$context_only" \
      | jq -r $fields
 ```
@@ -109,7 +127,7 @@ kb-query "$kb" "$query" "${fields[@]}"
 
 ### API Commands
 
-Available API commands are 'list' and 'help'.
+Available API commands are 'list' and 'help' (no authentication required).
 
 ```bash
 curl -s "https://yatti.id/v1/help"
@@ -125,75 +143,6 @@ curl -s "https://yatti.id/v1/list"
 The `kb-query` script is a simplified command-line interface into the customKB knowledgebase API. It is essentially a wrapper for a `curl` command.
 
 ```
-kb-query 0.1.3 - Interface into YaTTI CustomKB knowledgebase API
 
-Requires:
-
-    sudo apt install git curl jq gridsite-clients
-
-Installation:
-
-    git clone https://github.com/Open-Technology-Foundation/kb-query.git && sudo kb-query/kb-query.install
-
-json Return Fields:
-
-   ( kb query context_only response elapsed_seconds error )
-
-Usage:
-
-  kb-query {command} [.field1 [.field2 ...]]
-
-  kb-query {-c} {knowledgebase} {query} [.field1 [.field2 ...]]
-
-  command         list | help | update
-
-  knowledgebase   name of customKB knowledgebase
-
-  query           query string for LLM
-
-  .field{1...}    fields to output, default is all.
-
-Options:
-  -c, --context-only    Return entire context reference only,
-                        do not send to LLM.
-                        context_only="0"
-  -v, --verbose         Increase output verbosity
-  -q, --quiet           Suppress non-error messages
-                        VERBOSE="1"
-  -d, --debug           Print debug messages
-                        DEBUG="0"
-  -V, --version         Print version and exit
-                        VERSION="0.1.3"
-  -h, --help            Display this help
-
-Examples:
-
-  # Help for kb-query utility
-
-    kb-query --help
-
-  # Overview YaTTI knowledgebase
-
-    kb-query help
-
-  # List YaTTI knowledgebases
-
-    kb-query list
-
-  # Query knowledgebase
-
-    kb-query appliedanthropology "Concisely define 'applied anthropology'."
-
-  # Query knowledgebase and output fields .query and .response
-
-    kb-query appliedanthropology "Concisely define 'applied anthropology'." .query .response
-
-  # Query knowledgebase for context only
-
-    kb-query appliedanthropology -c "Concisely define 'applied anthropology'."
-
-  # Update to latest version
-
-    kb-query update
 ```
 
