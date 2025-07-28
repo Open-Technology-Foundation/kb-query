@@ -71,15 +71,15 @@ chmod 600 ~/.config/kb-query/config
 ## Public vs Authenticated Endpoints
 
 ### Public Endpoints (No API Key Required)
-- `GET /v1/help` - API documentation
-- `GET /v1/list` - List available knowledge bases
-- `GET /v1/list.canonical` - List canonical knowledge bases
-- `GET /v1/list.symlinks` - List symlinked knowledge bases
-- `GET /v1/list.all` - List all knowledge bases
+- `GET /v1/index.php/help` - API documentation
+- `GET /v1/index.php/list` - List available knowledge bases
+- `GET /v1/index.php/list.canonical` - List canonical knowledge bases
+- `GET /v1/index.php/list.symlinks` - List symlinked knowledge bases
+- `GET /v1/index.php/list.all` - List all knowledge bases
 
 ### Authenticated Endpoints (API Key Required)
-- `GET /v1/{kb}/?q={query}` - Query a knowledge base
-- `GET /v1/{kb}/config` - Get knowledge base configuration
+- `GET /v1/index.php/{kb}/?q={query}` - Query a knowledge base
+- `GET /v1/index.php/{kb}/config` - Get knowledge base configuration
 - All other knowledge base operations
 
 ## Usage Examples
@@ -88,8 +88,8 @@ chmod 600 ~/.config/kb-query/config
 
 ```bash
 # These work without an API key
-curl https://yatti.id/v1/help
-curl https://yatti.id/v1/list
+curl https://yatti.id/v1/index.php/help
+curl https://yatti.id/v1/index.php/list
 ```
 
 ### With Authentication (Required for KB Access)
@@ -100,7 +100,7 @@ export API_KEY="yatti_your_key_here"
 
 # Using curl with Authorization header
 curl -H "Authorization: Bearer $API_KEY" \
-     "https://yatti.id/v1/appliedanthropology?q=What+is+dharma"
+     "https://yatti.id/v1/index.php/appliedanthropology?q=What+is+dharma"
 
 # Using kb-query (automatically uses YATTI_API_KEY)
 export YATTI_API_KEY="$API_KEY"
@@ -153,7 +153,7 @@ yatti-api-key list
 
 # Check rate limit status (included in response headers)
 curl -I -H "Authorization: Bearer $API_KEY" \
-     "https://yatti.id/v1/appliedanthropology?q=test"
+     "https://yatti.id/v1/index.php/appliedanthropology?q=test"
 # Look for:
 # X-RateLimit-Limit: 1000
 # X-RateLimit-Remaining: 999
@@ -268,7 +268,7 @@ kb-query -d list 2>&1 | grep -i auth
 
 # Test with curl to see raw response
 curl -v -H "Authorization: Bearer $YATTI_API_KEY" \
-     "https://yatti.id/v1/appliedanthropology?q=test"
+     "https://yatti.id/v1/index.php/appliedanthropology?q=test"
 
 # Check if API key is set
 echo "API Key: ${YATTI_API_KEY:0:16}..."
@@ -285,7 +285,7 @@ echo "API Key: ${YATTI_API_KEY:0:16}..."
 
 3. **Intermittent failures**
    - Check rate limits: Look at X-RateLimit-Remaining header
-   - Network issues: Test with `curl https://yatti.id/v1/help`
+   - Network issues: Test with `curl https://yatti.id/v1/index.php/help`
 
 ## API Response Headers
 
@@ -300,6 +300,6 @@ X-RateLimit-Reset: 1635360000  # Unix timestamp when limit resets
 ## Support
 
 For API key issues or access requests:
-1. Check public endpoints work: `curl https://yatti.id/v1/help`
+1. Check public endpoints work: `curl https://yatti.id/v1/index.php/help`
 2. Verify your API key is active: Contact administrator
 3. Report issues with your key prefix (first 8 chars only)

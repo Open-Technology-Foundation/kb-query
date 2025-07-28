@@ -200,7 +200,7 @@ customkb bm25 mynewkb
 
 **Direct API call:**
 ```bash
-curl -s "https://yatti.id/v1/appliedanthropology?q=$(urlencode 'What is dharma?')"
+curl -s "https://yatti.id/v1/index.php/appliedanthropology?q=$(urlencode 'What is dharma?')"
 ```
 
 **Using kb-query CLI:**
@@ -211,10 +211,10 @@ kb-query okusiassociates -c "PMA company requirements"  # Context only
 
 ## Key API Endpoints
 
-- `https://yatti.id/v1/{knowledgebase}?q={query}` - Query with LLM response
-- `https://yatti.id/v1/{knowledgebase}?q={query}&context_only` - Context only
-- `https://yatti.id/v1/list` - List available knowledgebases
-- `https://yatti.id/v1/help` - API documentation
+- `https://yatti.id/v1/index.php/{knowledgebase}?q={query}` - Query with LLM response
+- `https://yatti.id/v1/index.php/{knowledgebase}?q={query}&context_only` - Context only
+- `https://yatti.id/v1/index.php/list` - List available knowledgebases
+- `https://yatti.id/v1/index.php/help` - API documentation
 
 ## Environment Variables
 

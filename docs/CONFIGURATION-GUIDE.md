@@ -30,7 +30,7 @@ YATTI_API_KEY="yatti_your_api_key_here"
 
 # API Settings
 API_TIMEOUT=30                    # Request timeout in seconds
-API_BASE_URL="https://yatti.id/v1"  # API endpoint
+API_BASE_URL="https://yatti.id/v1/index.php"  # API endpoint
 
 # Output Settings
 OUTPUT_FORMAT="text"              # text, json, pretty

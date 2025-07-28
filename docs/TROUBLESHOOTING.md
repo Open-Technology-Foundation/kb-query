@@ -49,7 +49,7 @@ Error: Invalid API key. Please check your credentials.
 - Confirm key hasn't expired
 - Test with curl:
   ```bash
-  curl -H "Authorization: Bearer $YATTI_API_KEY" https://yatti.id/v1/list
+  curl -H "Authorization: Bearer $YATTI_API_KEY" https://yatti.id/v1/index.php/list
   ```
 
 ### Query Errors
@@ -69,7 +69,7 @@ Error: Knowledgebase 'myproject' not found
 
 3. Verify API endpoint:
    ```bash
-   curl -s "https://yatti.id/v1/list" | jq -r '.knowledgebases[].name'
+   curl -s "https://yatti.id/v1/index.php/list" | jq -r '.knowledgebases[].name'
    ```
 
 #### Problem: "Request timeout"
@@ -90,7 +90,7 @@ Error: Request timed out after 30 seconds
 
 3. Check network connectivity:
    ```bash
-   curl -I https://yatti.id/v1/help
+   curl -I https://yatti.id/v1/index.php/help
    ```
 
 ### Output Issues
@@ -320,7 +320,7 @@ Error: Failed to establish a new connection: [Errno 111] Connection refused
 **Solutions:**
 1. Check API status:
    ```bash
-   curl -I https://yatti.id/v1/help
+   curl -I https://yatti.id/v1/index.php/help
    ```
 
 2. Check proxy settings:
@@ -597,7 +597,7 @@ customkb diagnose myproject
 
 ```bash
 # Test API connectivity
-curl -v https://yatti.id/v1/help
+curl -v https://yatti.id/v1/index.php/help
 
 # Check DNS
 dig yatti.id
@@ -606,7 +606,7 @@ dig yatti.id
 traceroute yatti.id
 
 # Test with different tools
-wget --debug https://yatti.id/v1/list
+wget --debug https://yatti.id/v1/index.php/list
 ```
 
 ### System Diagnostics

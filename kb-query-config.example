@@ -12,8 +12,8 @@
 # Run: chmod 600 ~/.config/kb-query/config
 
 # API Settings
-# Base URL for the YaTTI API (default: https://yatti.id/v1)
-#BASEURL="https://yatti.id/v1"
+# Base URL for the YaTTI API (default: https://yatti.id/v1/index.php)
+#BASEURL="https://yatti.id/v1/index.php"
 
 # Request timeout in seconds (default: 30)
 API_TIMEOUT=30

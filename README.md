@@ -16,7 +16,7 @@ Available knowledgebases at the moment are:
     uv
     wayang.net
 
-The YaTTI API endpoint is `https://yatti.id/v1`
+The YaTTI API endpoint is `https://yatti.id/v1/index.php`
 
 ### Authentication
 
@@ -50,7 +50,7 @@ Requires Ubuntu 24.04, `git`, `curl`, `urlencode` and `jq`.
 
 To query a knowledgebase, syntax is in this general form:
 
-    curl -s -H "Authorization: Bearer $API_KEY" "https://yatti.id/v1/{knowledgebase}?q={query}&{context_only}"
+    curl -s -H "Authorization: Bearer $API_KEY" "https://yatti.id/v1/index.php/{knowledgebase}?q={query}&{context_only}"
 
 There are two parameters; `q` and `context_only`.
 
@@ -70,7 +70,7 @@ api_key="yatti_your_api_key_here"
 curl -H "Accept: application/json" \
      -H "Content-Type: application/json" \
      -H "Authorization: Bearer $api_key" \
-     -s "https://yatti.id/v1/$kb/?q=\$(urlencode "$query")&$context_only" \
+     -s "https://yatti.id/v1/index.php/$kb/?q=\$(urlencode "$query")&$context_only" \
      | jq -r $fields
 ```
 
@@ -84,7 +84,7 @@ curl -H "Accept: application/json" \
 ## !/usr/env /usr/local/bin/scripttour
 # These are the essentials for accessing
 # YaTTI CustomKB knowledgebases using simple
-# curl directives to https://yatti.id/v1/
+# curl directives to https://yatti.id/v1/index.php/
 
 # This is the knowledgebase to access:
 kb=appliedanthropology
@@ -118,7 +118,7 @@ kb-query "$kb" "$query" "${fields[@]}"
 # Or you can use 'curl' directly
 #curl -H "Accept: application/json" \
 #     -H "Content-Type: application/json" \
-#     -s "https://yatti.id/v1/$kb/?q=$(urlencode "$query")&$context_only" \
+#     -s "https://yatti.id/v1/index.php/$kb/?q=$(urlencode "$query")&$context_only" \
 #     | jq -r $fields
 #fin
 ```
@@ -130,8 +130,8 @@ kb-query "$kb" "$query" "${fields[@]}"
 Available API commands are 'list' and 'help' (no authentication required).
 
 ```bash
-curl -s "https://yatti.id/v1/help"
-curl -s "https://yatti.id/v1/list"
+curl -s "https://yatti.id/v1/index.php/help"
+curl -s "https://yatti.id/v1/index.php/list"
 ```
 
 'list' will list all available YaTTI knowledgebases.

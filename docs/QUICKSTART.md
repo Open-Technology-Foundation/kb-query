@@ -206,7 +206,7 @@ customkb query quickstart "GPU acceleration" --context-only
 ```bash
 # Direct API call
 curl -H "Authorization: Bearer $YATTI_API_KEY" \
-     "https://yatti.id/v1/appliedanthropology?q=What%20is%20karma"
+     "https://yatti.id/v1/index.php/appliedanthropology?q=What%20is%20karma"
 
 # With kb-query wrapper
 kb-query appliedanthropology "What is karma?" .response

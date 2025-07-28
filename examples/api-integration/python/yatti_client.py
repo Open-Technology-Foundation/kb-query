@@ -15,13 +15,13 @@ from urllib.parse import urlencode
 class YaTTIClient:
     """Client for YaTTI CustomKB API."""
     
-    def __init__(self, api_key: str, base_url: str = "https://yatti.id/v1"):
+    def __init__(self, api_key: str, base_url: str = "https://yatti.id/v1/index.php"):
         """
         Initialize the YaTTI client.
         
         Args:
             api_key: Your YaTTI API key
-            base_url: API base URL (default: https://yatti.id/v1)
+            base_url: API base URL (default: https://yatti.id/v1/index.php)
         """
         self.api_key = api_key
         self.base_url = base_url.rstrip('/')

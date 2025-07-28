@@ -209,7 +209,7 @@ declare -a Options=()
 #  kb_query "$kb" "$context_only" "$query" "$reference" ${fields[*]}
 kbquery() {
   # kb c query ref
-  local BASEURL='https://yatti.id/v1'
+  local BASEURL='https://yatti.id/v1/index.php'
   # [[ $HOSTNAME == 'okusi' ]] && BASEURL='https://yatti.id.local/v1'  # Disabled - always use public endpoint
   local kb="$1"
   shift
@@ -331,7 +331,7 @@ EOT
         -H "Accept: application/json" \
         -H "Content-Type: application/json" \
         $auth_headers \
-        "$BASEURL/index.php/$kb/?q="$query"$context_only$reference$options"
+        "$BASEURL/$kb/?q="$query"$context_only$reference$options"
         )" || {
     curl_exit=$?
     case $curl_exit in

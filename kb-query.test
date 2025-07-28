@@ -2,7 +2,7 @@
 ## !/usr/env /usr/local/bin/scripttour
 # These are the essentials for accessing
 # YaTTI CustomKB knowledgebases using simple
-# curl directives to https://yatti.id/v1/
+# curl directives to https://yatti.id/v1/index.php/
 
 # This is the knowledgebase to access:
 kb=appliedanthropology
@@ -36,6 +36,6 @@ kb-query "$kb" "$query" "${fields[@]}"
 # Or you can use 'curl' directly
 #curl -H "Accept: application/json" \
 #     -H "Content-Type: application/json" \
-#     -s "https://yatti.id/v1/$kb/?q=$(urlencode "$query")&$context_only" \
+#     -s "https://yatti.id/v1/index.php/$kb/?q=$(urlencode "$query")&$context_only" \
 #     | jq -r $fields
 #fin

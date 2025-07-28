@@ -205,10 +205,10 @@ PRESERVE_EMBED_DATA_TEXT=1
 #### Direct API Calls
 ```bash
 # Basic query
-curl -s "https://yatti.id/v1/appliedanthropology?q=$(urlencode 'What is dharma?')"
+curl -s "https://yatti.id/v1/index.php/appliedanthropology?q=$(urlencode 'What is dharma?')"
 
 # Context-only retrieval
-curl -s "https://yatti.id/v1/okusiassociates?q=$(urlencode 'PMA requirements')&context_only"
+curl -s "https://yatti.id/v1/index.php/okusiassociates?q=$(urlencode 'PMA requirements')&context_only"
 ```
 
 #### Using kb-query Wrapper

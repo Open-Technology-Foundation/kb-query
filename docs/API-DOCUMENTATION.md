@@ -2,12 +2,12 @@
 
 ## Overview
 
-The YaTTI CustomKB API provides RESTful endpoints for querying AI-powered knowledgebases. The API is accessible at `https://yatti.id/v1/` and requires authentication for most operations.
+The YaTTI CustomKB API provides RESTful endpoints for querying AI-powered knowledgebases. The API is accessible at `https://yatti.id/v1/index.php/` and requires authentication for most operations.
 
 ## Base URL
 
 ```
-https://yatti.id/v1/
+https://yatti.id/v1/index.php/
 ```
 
 ## Authentication
@@ -27,7 +27,7 @@ X-API-Key: yatti_your_api_key_here
 ### Example
 ```bash
 curl -H "Authorization: Bearer yatti_your_api_key_here" \
-     "https://yatti.id/v1/appliedanthropology?q=What%20is%20dharma"
+     "https://yatti.id/v1/index.php/appliedanthropology?q=What%20is%20dharma"
 ```
 
 ## Endpoints
@@ -38,7 +38,7 @@ Query a specific knowledgebase with optional LLM processing.
 
 #### Endpoint
 ```
-GET /v1/{knowledgebase}
+GET /v1/index.php/{knowledgebase}
 ```
 
 #### Parameters
@@ -64,7 +64,7 @@ GET /v1/{knowledgebase}
 #### Request Example
 ```bash
 curl -H "Authorization: Bearer yatti_api_key" \
-     "https://yatti.id/v1/okusiassociates?q=What%20are%20PMA%20requirements&top_k=20&temperature=0.3"
+     "https://yatti.id/v1/index.php/okusiassociates?q=What%20are%20PMA%20requirements&top_k=20&temperature=0.3"
 ```
 
 #### Response Format
@@ -105,12 +105,12 @@ Get a list of all available knowledgebases.
 
 #### Endpoint
 ```
-GET /v1/list
+GET /v1/index.php/list
 ```
 
 #### Request Example
 ```bash
-curl "https://yatti.id/v1/list"
+curl "https://yatti.id/v1/index.php/list"
 ```
 
 #### Response Format
@@ -143,12 +143,12 @@ Get API documentation and usage information.
 
 #### Endpoint
 ```
-GET /v1/help
+GET /v1/index.php/help
 ```
 
 #### Request Example
 ```bash
-curl "https://yatti.id/v1/help"
+curl "https://yatti.id/v1/index.php/help"
 ```
 
 #### Response Format
@@ -158,13 +158,13 @@ curl "https://yatti.id/v1/help"
   "endpoints": {
     "query": {
       "method": "GET",
-      "path": "/v1/{knowledgebase}",
+      "path": "/v1/index.php/{knowledgebase}",
       "description": "Query a knowledgebase",
       "parameters": {...}
     },
     "list": {
       "method": "GET",
-      "path": "/v1/list",
+      "path": "/v1/index.php/list",
       "description": "List available knowledgebases"
     }
   },
@@ -182,13 +182,13 @@ Get detailed information about a specific knowledgebase.
 
 #### Endpoint
 ```
-GET /v1/{knowledgebase}/info
+GET /v1/index.php/{knowledgebase}/info
 ```
 
 #### Request Example
 ```bash
 curl -H "Authorization: Bearer yatti_api_key" \
-     "https://yatti.id/v1/okusiassociates/info"
+     "https://yatti.id/v1/index.php/okusiassociates/info"
 ```
 
 #### Response Format
@@ -308,10 +308,10 @@ X-RateLimit-Reset: 1642360800
 Always URL encode query parameters:
 ```bash
 # Good
-curl "https://yatti.id/v1/kb?q=What%20is%20a%20%22PMA%22%20company%3F"
+curl "https://yatti.id/v1/index.php/kb?q=What%20is%20a%20%22PMA%22%20company%3F"
 
 # Bad
-curl "https://yatti.id/v1/kb?q=What is a "PMA" company?"
+curl "https://yatti.id/v1/index.php/kb?q=What is a "PMA" company?"
 ```
 
 ### 2. Error Handling
@@ -380,7 +380,7 @@ import urllib.parse
 class YaTTIClient:
     def __init__(self, api_key):
         self.api_key = api_key
-        self.base_url = "https://yatti.id/v1"
+        self.base_url = "https://yatti.id/v1/index.php"
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Accept": "application/json"
@@ -419,7 +419,7 @@ const axios = require('axios');
 class YaTTIClient {
     constructor(apiKey) {
         this.apiKey = apiKey;
-        this.baseUrl = 'https://yatti.id/v1';
+        this.baseUrl = 'https://yatti.id/v1/index.php';
     }
     
     async query(kb, question, options = {}) {
@@ -454,25 +454,25 @@ client.query('okusiassociates', 'PMA requirements', { top_k: 20 })
 #### Basic Query
 ```bash
 curl -H "Authorization: Bearer yatti_api_key" \
-     "https://yatti.id/v1/appliedanthropology?q=What%20is%20dharma"
+     "https://yatti.id/v1/index.php/appliedanthropology?q=What%20is%20dharma"
 ```
 
 #### Query with Options
 ```bash
 curl -H "Authorization: Bearer yatti_api_key" \
-     "https://yatti.id/v1/okusiassociates?q=Company%20formation%20process&top_k=30&temperature=0.2&model=gpt-4"
+     "https://yatti.id/v1/index.php/okusiassociates?q=Company%20formation%20process&top_k=30&temperature=0.2&model=gpt-4"
 ```
 
 #### Context-Only Query
 ```bash
 curl -H "Authorization: Bearer yatti_api_key" \
-     "https://yatti.id/v1/jakartapost?q=Latest%20technology%20news&context_only=true"
+     "https://yatti.id/v1/index.php/jakartapost?q=Latest%20technology%20news&context_only=true"
 ```
 
 #### With Reference Text
 ```bash
 curl -H "Authorization: Bearer yatti_api_key" \
-     -G "https://yatti.id/v1/okusiassociates" \
+     -G "https://yatti.id/v1/index.php/okusiassociates" \
      --data-urlencode "q=Can this company structure work?" \
      --data-urlencode "reference=We have 3 foreign and 2 local shareholders"
 ```
