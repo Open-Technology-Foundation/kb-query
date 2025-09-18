@@ -108,7 +108,7 @@ A comprehensive test suite has been created for kb-query with 8 test modules cov
 ### 8. **test_integration.sh** (12 tests)
 - ✅ Real API list command
 - ✅ Real API help command
-- ✅ Real knowledge base queries
+- ✅ Real knowledgebase queries
 - ✅ JSON output with real data
 - ✅ Context-only queries
 - ✅ Complete workflow testing

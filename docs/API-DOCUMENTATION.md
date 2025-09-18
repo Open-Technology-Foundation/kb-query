@@ -119,7 +119,7 @@ curl "https://yatti.id/v1/index.php/list"
   "knowledgebases": [
     {
       "name": "appliedanthropology",
-      "description": "Applied Anthropology knowledge base",
+      "description": "Applied Anthropology knowledgebase",
       "document_count": 245,
       "last_updated": "2024-01-15T10:30:00Z",
       "status": "active"
@@ -195,7 +195,7 @@ curl -H "Authorization: Bearer yatti_api_key" \
 ```json
 {
   "name": "okusiassociates",
-  "description": "Indonesian business consultancy knowledge base",
+  "description": "Indonesian business consultancy knowledgebase",
   "statistics": {
     "document_count": 3651,
     "total_chunks": 45230,
@@ -501,7 +501,7 @@ Webhook support is planned for asynchronous processing of long-running queries:
 ### Planned Features
 - Webhook support
 - Batch query processing
-- Knowledge base search
+- Knowledgebase search
 - Document upload API
 - User-specific knowledgebases
 

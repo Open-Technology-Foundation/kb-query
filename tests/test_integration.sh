@@ -33,7 +33,7 @@ test_real_api_help() {
     assert_output_contains "CustomKB"
 }
 
-# Test real knowledge base query
+# Test real knowledgebase query
 test_real_kb_query() {
     if ! check_internet; then
         skip_test "${FUNCNAME[0]}" "No internet connection"
@@ -81,14 +81,14 @@ test_complete_workflow() {
         return
     fi
     
-    # 1. List knowledge bases
+    # 1. List knowledgebases
     kb_query list >/dev/null 2>&1
     assert_exit_code 0
     
     # 2. Check cache was created
     assert_file_exists "$XDG_CACHE_HOME/kb-query/kb-list"
     
-    # 3. Query a knowledge base
+    # 3. Query a knowledgebase
     kb_query --timeout 120 appliedanthropology "What is mindfulness?" >/dev/null 2>&1
     assert_exit_code 0
     
@@ -157,7 +157,7 @@ test_error_handling_integration() {
         return
     fi
     
-    # Test non-existent knowledge base
+    # Test non-existent knowledgebase
     kb_query nonexistent-kb-$$ "test" 2>&1 || true
     assert_exit_code 1
     assert_error_contains "not found"

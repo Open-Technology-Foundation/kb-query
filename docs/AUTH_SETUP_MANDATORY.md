@@ -5,12 +5,12 @@ This guide explains how to set up and use the mandatory API key authentication s
 ## Overview
 
 The authentication system provides:
-- **Mandatory** API key-based authentication for all knowledge base queries
+- **Mandatory** API key-based authentication for all knowledgebase queries
 - Public access only for `help` and `list` endpoints
 - Per-key rate limiting
 - Usage tracking and analytics
 - Fine-grained permissions
-- Knowledge base access control
+- Knowledgebase access control
 
 ## Installation
 
@@ -54,7 +54,7 @@ sudo -u www-data yatti-api-key create user@example.com "User API key"
 
 ### 2. Client-Side Setup
 
-Users MUST have an API key to access any knowledge base:
+Users MUST have an API key to access any knowledgebase:
 
 ```bash
 # Update kb-query to latest version
@@ -72,15 +72,15 @@ chmod 600 ~/.config/kb-query/config
 
 ### Public Endpoints (No API Key Required)
 - `GET /v1/index.php/help` - API documentation
-- `GET /v1/index.php/list` - List available knowledge bases
-- `GET /v1/index.php/list.canonical` - List canonical knowledge bases
-- `GET /v1/index.php/list.symlinks` - List symlinked knowledge bases
-- `GET /v1/index.php/list.all` - List all knowledge bases
+- `GET /v1/index.php/list` - List available knowledgebases
+- `GET /v1/index.php/list.canonical` - List canonical knowledgebases
+- `GET /v1/index.php/list.symlinks` - List symlinked knowledgebases
+- `GET /v1/index.php/list.all` - List all knowledgebases
 
 ### Authenticated Endpoints (API Key Required)
-- `GET /v1/index.php/{kb}/?q={query}` - Query a knowledge base
-- `GET /v1/index.php/{kb}/config` - Get knowledge base configuration
-- All other knowledge base operations
+- `GET /v1/index.php/{kb}/?q={query}` - Query a knowledgebase
+- `GET /v1/index.php/{kb}/config` - Get knowledgebase configuration
+- All other knowledgebase operations
 
 ## Usage Examples
 
@@ -135,10 +135,10 @@ yatti-api-key create user@example.com "Description" "Organization"
 # Grant additional permissions as needed
 yatti-api-key permissions yatti_012 "read,write"
 
-# Restrict to specific knowledge bases
+# Restrict to specific knowledgebases
 yatti-api-key allow-kb yatti_012 "appliedanthropology,garydean"
 
-# Or allow all knowledge bases (default)
+# Or allow all knowledgebases (default)
 yatti-api-key allow-kb yatti_012 "all"
 ```
 
@@ -196,7 +196,7 @@ curl -I -H "Authorization: Bearer $API_KEY" \
 
 6. **KB Access Denied**
    ```
-   {"error":"Access to knowledge base 'private-kb' is not allowed"}
+   {"error":"Access to knowledgebase 'private-kb' is not allowed"}
    ```
    Solution: Your key doesn't have access to this KB
 

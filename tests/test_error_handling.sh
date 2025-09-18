@@ -121,7 +121,7 @@ EOF
     assert_error_contains "Database connection failed"
 }
 
-# Test non-existent knowledge base
+# Test non-existent knowledgebase
 test_nonexistent_kb_error() {
     cat >"$TEST_TEMP_DIR/kb-query-mock" <<'EOF'
 #!/bin/bash

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-The YaTTI Knowledge Base System is a comprehensive AI-powered platform for creating, managing, and querying intelligent knowledge repositories. It combines advanced natural language processing, vector databases, and large language models to transform document collections into searchable, context-aware knowledge bases that provide accurate, relevant answers.
+The YaTTI Knowledgebase System is a comprehensive AI-powered platform for creating, managing, and querying intelligent knowledge repositories. It combines advanced natural language processing, vector databases, and large language models to transform document collections into searchable, context-aware knowledgebases that provide accurate, relevant answers.
 
 ## Purpose
 
@@ -35,7 +35,7 @@ The included example, Okusi Associates, demonstrates a production implementation
 ### Core Components
 
 #### 1. kb-query CLI (v0.9.14)
-A lightweight command-line interface for querying hosted knowledge bases via the YaTTI API.
+A lightweight command-line interface for querying hosted knowledgebases via the YaTTI API.
 
 **Key Features:**
 - Simple query interface with URL-encoded API calls
@@ -62,7 +62,7 @@ A sophisticated Python tool for building and managing AI-powered vector database
 Server-side handler that bridges kb-query requests to CustomKB instances.
 
 **Key Features:**
-- Routes queries to appropriate knowledge bases
+- Routes queries to appropriate knowledgebases
 - Executes CustomKB commands server-side
 - Rate limiting and authentication
 - JSON response formatting with timing metrics
@@ -112,19 +112,19 @@ Server-side handler that bridges kb-query requests to CustomKB instances.
 
 ### Common Workflows
 
-#### 1. Quick Query of Existing Knowledge Base
+#### 1. Quick Query of Existing Knowledgebase
 ```bash
-# List available knowledge bases
+# List available knowledgebases
 kb-query list
 
-# Query a knowledge base
+# Query a knowledgebase
 kb-query appliedanthropology "What is dharma?"
 
 # Get detailed response with specific fields
 kb-query okusiassociates "How to set up a PMA company?" .query .response
 ```
 
-#### 2. Building a New Knowledge Base
+#### 2. Building a New Knowledgebase
 ```bash
 # Set up environment
 cd customkb
@@ -173,7 +173,7 @@ cd okusiassociates
 
 ### Configuration Examples
 
-#### Basic Knowledge Base Config
+#### Basic Knowledgebase Config
 ```ini
 [DEFAULT]
 vector_model = text-embedding-3-small
@@ -241,7 +241,7 @@ customkb verify-indexes myproject
 ## Important Notes
 
 1. **API Keys Required**: OpenAI API key is mandatory; Anthropic/Google keys optional
-2. **Storage Location**: All knowledge bases stored in `/var/lib/vectordbs/`
+2. **Storage Location**: All knowledgebases stored in `/var/lib/vectordbs/`
 3. **Security**: All inputs validated, API keys protected, SQL injection prevented
 4. **Performance**: Use optimization commands for large datasets
 5. **Logs**: Check `/var/lib/vectordbs/{kb}/logs/` for debugging
@@ -249,4 +249,4 @@ customkb verify-indexes myproject
 
 ## Summary
 
-The YaTTI Knowledge Base System provides a complete solution for organizations needing to transform static documentation into intelligent, queryable knowledge repositories. It combines enterprise-grade security, state-of-the-art AI models, and flexible configuration options to deliver accurate, contextual answers at scale. Whether serving customer queries, supporting internal teams, or managing regulatory compliance, the system adapts to various use cases while maintaining high performance and accuracy.
+The YaTTI Knowledgebase System provides a complete solution for organizations needing to transform static documentation into intelligent, queryable knowledge repositories. It combines enterprise-grade security, state-of-the-art AI models, and flexible configuration options to deliver accurate, contextual answers at scale. Whether serving customer queries, supporting internal teams, or managing regulatory compliance, the system adapts to various use cases while maintaining high performance and accuracy.
