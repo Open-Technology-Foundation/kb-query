@@ -1,5 +1,5 @@
 #!/bin/bash
-# Bash completion for kb-query
+# Bash completion for kb-query scripts
 # Install: source this file in .bashrc or copy to /etc/bash_completion.d/
 
 _kb_query_completions() {
@@ -8,27 +8,27 @@ _kb_query_completions() {
   cur="${COMP_WORDS[COMP_CWORD]}"
   prev="${COMP_WORDS[COMP_CWORD-1]}"
   
-  # Cache file for knowledgebase list
+  # Cache file for knowledge base list
   local cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/kb-query"
   local cache_file="$cache_dir/kb-list"
   local cache_age=3600  # 1 hour in seconds
   
-  # Function to get knowledgebase list
+  # Function to get knowledge base list
   _get_kb_list() {
     # Create cache directory if it doesn't exist
-    mkdir -p "$cache_dir"
+    mkdir -p "$cache_dir" 2>/dev/null
     
     # Check if cache is fresh
     if [[ -f "$cache_file" ]] && [[ $(( $(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0) )) -lt $cache_age ]]; then
-      cat "$cache_file"
+      cat "$cache_file" 2>/dev/null
     else
       # Refresh cache
       if kb-query list 2>/dev/null | jq -r '.[]' 2>/dev/null > "$cache_file.tmp"; then
         mv "$cache_file.tmp" "$cache_file"
         cat "$cache_file"
       else
-        # Fallback to some common knowledgebases
-        echo "appliedanthropology garydean jakartapost okusiassociates okusimail"
+        # Fallback to some common knowledge bases
+        echo -e "appliedanthropology\ngarydean\njakartapost\nokusiassociates\nokusimail\nokusiresearch\nperaturan.go.id\nprosocial.world\nseculardharma\nuv\nwayang.net"
       fi
     fi
   }
@@ -39,7 +39,7 @@ _kb_query_completions() {
                  -d --debug -h --help -v --verbose -q --quiet -V --version \
                  --query-model --query-temperature --query-max-tokens --query-top-k \
                  --query-context-scope --query-role --query-context-files \
-                 --output-format --timeout"
+                 --output-format --timeout --api-key"
   
   # Handle option arguments
   case "${prev}" in
@@ -53,7 +53,7 @@ _kb_query_completions() {
       return 0
       ;;
     --query-model)
-      COMPREPLY=( $(compgen -W "gpt-4 gpt-4o gpt-4o-mini gpt-3.5-turbo claude-3-opus claude-3-sonnet" -- "${cur}") )
+      COMPREPLY=( $(compgen -W "gpt-4 gpt-4o gpt-4o-mini gpt-3.5-turbo claude-3-opus claude-3-sonnet claude-3-haiku" -- "${cur}") )
       return 0
       ;;
     --query-temperature)
@@ -64,19 +64,27 @@ _kb_query_completions() {
       COMPREPLY=( $(compgen -W "5 10 15 20 25 30" -- "${cur}") )
       return 0
       ;;
+    --query-context-scope)
+      COMPREPLY=( $(compgen -W "1 2 3 4 5" -- "${cur}") )
+      return 0
+      ;;
     --timeout)
       COMPREPLY=( $(compgen -W "10 20 30 60 90 120" -- "${cur}") )
       return 0
       ;;
+    --api-key|-R|--reference-str|--query-role|--query-max-tokens)
+      # No completion for these text arguments
+      return 0
+      ;;
   esac
   
-  # First argument - commands or knowledgebases
+  # First argument - commands or knowledge bases
   if [[ ${COMP_CWORD} -eq 1 ]]; then
     # If it starts with -, complete options
     if [[ ${cur} == -* ]]; then
       COMPREPLY=( $(compgen -W "${options}" -- "${cur}") )
     else
-      # Complete with commands and knowledgebases
+      # Complete with commands and knowledge bases
       local kbs=$(_get_kb_list | tr '\n' ' ')
       COMPREPLY=( $(compgen -W "${commands} ${kbs}" -- "${cur}") )
     fi
@@ -86,7 +94,7 @@ _kb_query_completions() {
       # Complete options
       COMPREPLY=( $(compgen -W "${options}" -- "${cur}") )
     elif [[ ${COMP_CWORD} -eq 2 ]] && [[ "${COMP_WORDS[1]}" != "list" ]] && [[ "${COMP_WORDS[1]}" != "help" ]] && [[ "${COMP_WORDS[1]}" != "update" ]]; then
-      # Second argument for knowledgebase queries - no completion for query text
+      # Second argument for knowledge base queries - no completion for query text
       return 0
     else
       # Field completion (.field names)
@@ -97,4 +105,37 @@ _kb_query_completions() {
   fi
 }
 
+_kb_query_help_completions() {
+  local cur prev
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  
+  # kb-query.help just passes arguments to kb-query help
+  if [[ ${cur} == .* ]]; then
+    COMPREPLY=( $(compgen -W ".kb .query .context_only .reference .response .elapsed_seconds .error" -- "${cur}") )
+  fi
+}
+
+_kb_query_list_completions() {
+  local cur prev
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  
+  # First argument can be a format specifier
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+    COMPREPLY=( $(compgen -W "canonical" -- "${cur}") )
+  elif [[ ${cur} == .* ]]; then
+    COMPREPLY=( $(compgen -W ".kb .query .context_only .reference .response .elapsed_seconds .error" -- "${cur}") )
+  fi
+}
+
+_kb_query_test_completions() {
+  # kb-query.test doesn't take arguments
+  COMPREPLY=()
+}
+
+# Register completions for all kb-query scripts
 complete -F _kb_query_completions kb-query
+complete -F _kb_query_help_completions kb-query.help
+complete -F _kb_query_list_completions kb-query.list
+complete -F _kb_query_test_completions kb-query.test

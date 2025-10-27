@@ -389,7 +389,7 @@ EOT
   
   # Check for null response on non-list/help commands
   if [[ "$kb" != "list" ]] && [[ "$kb" != "help" ]] && [[ $(jq -r '.response // "null"' <<<"$result") == "null" ]]; then
-    die 1 "Knowledge base '$kb' not found or returned no data"
+    die 1 "Knowledgebase '$kb' not found or returned no data"
   fi
   
   # Format output based on OUTPUT_FORMAT
@@ -406,7 +406,7 @@ EOT
         jq -r '.response // empty' <<<"$result"
         echo
         echo "---"
-        echo "*Knowledge Base: $(jq -r '.kb // "unknown"' <<<"$result")*"
+        echo "*Knowledgebase: $(jq -r '.kb // "unknown"' <<<"$result")*"
         echo "*Query Time: $(jq -r '.elapsed_seconds // "unknown"' <<<"$result") seconds*"
       else
         jq -r $fields <<<"$result"

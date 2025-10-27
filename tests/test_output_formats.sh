@@ -63,7 +63,7 @@ test_markdown_format() {
     assert_output_contains "## Query Response"
     assert_output_contains "This is a test response"
     assert_output_contains "---"
-    assert_output_contains "*Knowledge Base: test-kb*"
+    assert_output_contains "*Knowledgebase: test-kb*"
     assert_output_contains "*Query Time: 1.234 seconds*"
 }
 

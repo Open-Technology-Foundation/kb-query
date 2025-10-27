@@ -47,7 +47,7 @@ MAX_REFERENCE_SIZE=4000
 #QUERY_ROLE="You are a helpful assistant that provides accurate information based on the given context."
 
 # Directory settings
-# Where to store knowledge bases (default: /var/lib/vectordbs)
+# Where to store knowledgebases (default: /var/lib/vectordbs)
 #VECTORDBS="/var/lib/vectordbs"
 
 # Verbosity settings
@@ -62,13 +62,13 @@ MAX_REFERENCE_SIZE=4000
 SAVE_HISTORY=1
 
 # Cache settings
-# How long to cache the knowledge base list (in seconds)
+# How long to cache the knowledgebase list (in seconds)
 KB_LIST_CACHE_TTL=3600
 
 # Performance settings
 # Number of parallel queries for batch mode (when implemented)
 #BATCH_WORKERS=4
 
-# Custom aliases for knowledge bases
+# Custom aliases for knowledgebases
 # alias_myproject="actual-kb-name"
 # This allows you to use 'kb-query myproject' instead of 'kb-query actual-kb-name'

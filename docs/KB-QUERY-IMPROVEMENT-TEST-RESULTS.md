@@ -59,7 +59,7 @@ All implemented improvements to kb-query have been tested and verified working c
    [response content]
    
    ---
-   *Knowledge Base: appliedanthropology*
+   *Knowledgebase: appliedanthropology*
    *Query Time: 24.989 seconds*
    ```
 

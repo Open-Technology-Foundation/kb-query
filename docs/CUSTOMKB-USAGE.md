@@ -645,7 +645,7 @@ print(response['response'])
 ### Shell Script Automation
 ```bash
 #!/bin/bash
-# Daily knowledge base update
+# Daily knowledgebase update
 
 KB_NAME="company_docs"
 DOCS_DIR="/shared/documents"
