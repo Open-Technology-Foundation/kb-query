@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
-#shellcheck disable=SC1091,SC2155
+#shellcheck disable=SC1091,SC2155,SC1090
 set -euo pipefail
-readonly -- PRG0="$(readlink -en -- "$0")"
+
+declare -r SCRIPT_PATH="$(realpath -e -- "$0")"
 #shellcheck disable=SC2034
-readonly -- PRGDIR="${PRG0%/*}" PRG="${PRG0##*/}"
-readonly -- LF=$'\n'
-declare -- VERSION="$(head -n 1 "$PRGDIR"/.version || true)"
+declare -r SCRIPT_DIR="${SCRIPT_PATH%/*}" PRG="${SCRIPT_PATH##*/}"
+declare -r LF=$'\n'
+declare -r VERSION="$(head -n 1 "$SCRIPT_DIR"/.version || true)"
+
 declare -ix VERBOSE=1 DEBUG=0 DRYRUN=1
 #shellcheck disable=SC2015
-[ -t 2 ] && declare -- RED=$'\033[0;31m' YELLOW=$'\033[0;33m' GREEN=$'\033[0;32m' NOCOLOR=$'\033[0m' || declare -- RED='' YELLOW='' GREEN='' NOCOLOR=''
+[ -t 2 ] && declare -r RED=$'\033[0;31m' YELLOW=$'\033[0;33m' GREEN=$'\033[0;32m' NOCOLOR=$'\033[0m' || declare -r RED='' YELLOW='' GREEN='' NOCOLOR=''
 vdebug(){ ((DEBUG))   || return 0; local msg; for msg in "$@"; do >&2 printf '%s: %sdebug%s: %s\n' "$PRG" "$YELLOW" "$NOCOLOR" "$msg"; done; }
 error() { local msg; for msg in "$@"; do >&2 printf '%s: %serror%s: %s\n' "$PRG" "$RED" "$NOCOLOR" "$msg"; done; }
 die() { local -i exitcode=1; if (($#)); then exitcode=$1; shift; fi; if (($#)); then error "$@"; fi; exit "$exitcode"; }
@@ -37,7 +39,7 @@ declare -- HISTORY_FILE="$DATA_DIR/history"
 
 # Check config file permissions if it contains API key
 if [[ -f "$CONFIG_FILE" ]] && grep -q "YATTI_API_KEY" "$CONFIG_FILE" 2>/dev/null; then
-    local perms=$(stat -c %a "$CONFIG_FILE" 2>/dev/null || stat -f %p "$CONFIG_FILE" 2>&1 | awk '{print substr($0, length-2)}')
+    declare -- perms=$(stat -c %a "$CONFIG_FILE" 2>/dev/null || stat -f %p "$CONFIG_FILE" 2>&1 | awk '{print substr($0, length-2)}')
     if [[ "$perms" != "600" ]]; then
         >&2 echo "${YELLOW}Warning: Config file has loose permissions ($perms)${NOCOLOR}"
         >&2 echo "Your API key may be exposed. Run: chmod 600 $CONFIG_FILE"
