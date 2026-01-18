@@ -258,7 +258,7 @@ QUERY_MODEL         # Override default query model
 - **CustomKB specific**: Use 2-space indentation (not 4!)
 
 ### Shell Scripts
-- Shebang '#!/bin/bash'
+- Shebang `#!/usr/bin/env bash`
 - Always `set -euo pipefail` at start for error handling
 - 2-space indentation !!important
 - Always declare variables before use; use local within functions
